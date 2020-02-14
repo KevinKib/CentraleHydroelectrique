@@ -1,0 +1,10 @@
+Centrales d'energies au bord dur Rhone.
+Centrale au fil de l'eau => barrage où on stocke peu d'eau pour alimenter une centrale.
+Volume de l'eau * delta de profondeur = energie produite. Une turbine produit entre 10 et 100 MegaW par heure, et 10 turbines par centrale.
+
+Parametre d'une turbine : - La hauteur de la profondeur de l'eau
+			  - Le debit de l'eau
+			  - La position des pâles
+			  - Production d'énergie
+
+Objectif de montrer la donnée pour voir la production/performance d'energie
