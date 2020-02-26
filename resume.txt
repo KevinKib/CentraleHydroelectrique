@@ -8,3 +8,5 @@ Parametre d'une turbine : - La hauteur de la profondeur de l'eau
 			  - Production d'énergie
 
 Objectif de montrer la donnée pour voir la production/performance d'energie
+
+Ajouter un fichier de configuration pour l'adresse IP du serveur
