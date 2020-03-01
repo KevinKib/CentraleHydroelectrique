@@ -4,10 +4,17 @@
 #include "../includes/Server.h"
 
 // ----- Constructors
-Server::Server ( const string ip, const ushort port )
-    : ip ( ip ), port ( port )
+hc::Server::Server ( )
+    : ip ( "" ), port ( 0 )
 { }
 
-Server::Server ( const Server & server )
+hc::Server::Server ( const string _ip, const ushort _port )
+    : ip ( _ip ), port ( _port )
+{ }
+
+hc::Server::Server ( const Server & server )
     : ip ( server.ip ), port ( server.port )
+{ }
+
+hc::Server::~Server ( )
 { }

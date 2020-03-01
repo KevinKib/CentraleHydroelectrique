@@ -5,17 +5,16 @@
 
 /** System/libs imports **/
 #include <string>
+#include "../libs/http/httplib.h"
 
 /** Personnal includes **/
 #include "typedefs.h"
 #include "Server.h"
 
-using namespace std;
-
 #ifndef HTTP_SERVER_H
 #define HTTP_SERVER_H
 
-class HTTPServer
+class HTTPServer: public httplib::Server
 {
     public:
     // ----- Constructors - Destructor
@@ -32,13 +31,22 @@ class HTTPServer
 
     // ----- Methods
 
-    private:
-    static const string CONFIG_FILENAME;
+    /**
+     * Run the server.
+     **/
+    void Run ( );
 
-    const Server catalogServer;
+    private:
+    // ----- Attributes
+    static const string CONFIG_FILENAME;
+    static const string SERVER_IP;
+    static const ushort SERVER_PORT;
+
+    hc::Server catalogServer;
+
 
     // ----- Methods
-    
+
     /**
      * Method to configurate the routes for the server to retrieve data.
      **/
@@ -46,6 +54,7 @@ class HTTPServer
 
     /**
      * Method to retrieve the content of the server's catalog.
+     * @return The content of the catalog.
      **/
     string receiveCatalogContent ( );
 };

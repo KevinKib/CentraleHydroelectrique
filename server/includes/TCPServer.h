@@ -18,7 +18,7 @@ using namespace std;
 
 enum TCPProtocol { PUSH, PULL };
 
-class TCPServer: public Server
+class TCPServer: public hc::Server
 {
     public:
     // ----- Constructors
