@@ -15,7 +15,7 @@
 
 using namespace std;
 
-class Server: public JSONParsable
+class Server
 {   
     public:
     // ----- Constructors
@@ -46,12 +46,6 @@ class Server: public JSONParsable
         out << "Ip : " << server.ip << ", port : " << server.port << endl;
         return out;
     }
-
-    // ----- Methods
-
-    // @Override
-    // @see the class {JSONParsable} for the description
-    virtual JSON toJSON ( ) const;
 
     // -------- Attributes
     const string ip;

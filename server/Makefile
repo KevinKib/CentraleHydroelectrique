@@ -13,6 +13,7 @@ EXE = server
 OFILES = $(BIN)/main.o \
 		 $(BIN)/Server.o \
 		 $(BIN)/TCPServer.o \
+		 $(BIN)/FileReader.o
 
 all: $(EXE)
 
@@ -21,6 +22,9 @@ clean:
 
 $(EXE): $(OFILES)
 	$(CC) $(CFLAGS) -o $(EXE) $(OFILES)
+
+$(BIN)/FileReader.o: $(INCLUDES)/FileReader.h
+	$(CC) $(CFLAGS) -o $(BIN)/FileReader.o -c $(SRC)/FileReader.cpp
 
 $(BIN)/main.o: $(SRC)/main.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/main.o -c $(SRC)/main.cpp

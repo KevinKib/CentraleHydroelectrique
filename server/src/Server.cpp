@@ -11,13 +11,3 @@ Server::Server ( const string ip, const ushort port )
 Server::Server ( const Server & server )
     : ip ( server.ip ), port ( server.port )
 { }
-
-// ------ Methods
-JSON Server::toJSON ( ) const
-{
-    JSON json;
-    json["ip"] = ip;
-    json["port"] = port;
-
-    return json;
-}

@@ -20,16 +20,3 @@ TCPServer::TCPServer ( const TCPServer & server )
     type ( server.type ), frequency ( server.frequency ),
     isConnected ( server.isConnected ), protocol ( server.protocol )
 { }
-
-// ----- Methods
-JSON TCPServer::toJSON ( ) const
-{
-    JSON json = Server::toJSON ( );
-    json["attribute"] = attribute;
-    json["type"] = type;
-    json["frequency"] = frequency;
-    json["isConnected"] = isConnected;
-    json["protocol"] = protocol;
-
-    return json;
-}

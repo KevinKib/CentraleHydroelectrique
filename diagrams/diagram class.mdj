@@ -942,7 +942,7 @@
 											"top": 695,
 											"width": 309.61962890625,
 											"height": 13,
-											"text": "+HTTPModule()",
+											"text": "+HTTPServer()",
 											"horizontalAlignment": 0
 										},
 										{
@@ -959,7 +959,7 @@
 											"top": 710,
 											"width": 309.61962890625,
 											"height": 13,
-											"text": "-configurateRoute(): void",
+											"text": "-configurateRoutes(): void",
 											"horizontalAlignment": 0
 										}
 									],
@@ -1154,7 +1154,7 @@
 											"top": 592,
 											"width": 446.88134765625,
 											"height": 13,
-											"text": "+makeRequest(params: json, server: const & Server): TCPResponse",
+											"text": "+MakeRequest(params: json, server: const & Server): TCPResponse",
 											"horizontalAlignment": 0
 										},
 										{
@@ -1222,7 +1222,7 @@
 											"top": 652,
 											"width": 446.88134765625,
 											"height": 13,
-											"text": "+disconnectFromServer(server: const & Server): bool",
+											"text": "+RisconnectFromServer(server: const & Server): bool",
 											"horizontalAlignment": 0
 										},
 										{
@@ -1345,7 +1345,7 @@
 											"font": "Arial;13;1",
 											"left": 141,
 											"top": 447,
-											"width": 199.0625,
+											"width": 204.12158203125,
 											"height": 13,
 											"text": "FileReader"
 										},
@@ -1380,7 +1380,7 @@
 									"font": "Arial;13;0",
 									"left": 136,
 									"top": 440,
-									"width": 209.0625,
+									"width": 214.12158203125,
 									"height": 25,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAFwXMjGbfFVu9w="
@@ -1407,7 +1407,7 @@
 									"font": "Arial;13;0",
 									"left": 136,
 									"top": 465,
-									"width": 209.0625,
+									"width": 214.12158203125,
 									"height": 10
 								},
 								{
@@ -1432,17 +1432,17 @@
 											"font": "Arial;13;0",
 											"left": 141,
 											"top": 480,
-											"width": 199.0625,
+											"width": 204.12158203125,
 											"height": 13,
 											"underline": true,
-											"text": "+readFile(pathname: string): string",
+											"text": "+ReadFile(pathname: string): string",
 											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 136,
 									"top": 475,
-									"width": 209.0625,
+									"width": 214.12158203125,
 									"height": 23
 								},
 								{
@@ -1482,7 +1482,7 @@
 							"containerChangeable": true,
 							"left": 136,
 							"top": 440,
-							"width": 209.0625,
+							"width": 214.12158203125,
 							"height": 65,
 							"nameCompartment": {
 								"$ref": "AAAAAAFwXMjGbfFUUNY="
@@ -3107,100 +3107,6 @@
 						},
 						{
 							"_type": "UMLGeneralizationView",
-							"_id": "AAAAAAFwgGYIqQZIRBc=",
-							"_parent": {
-								"$ref": "AAAAAAFF+qBtyKM79qY="
-							},
-							"model": {
-								"$ref": "AAAAAAFwgGYIqAZGm1k="
-							},
-							"subViews": [
-								{
-									"_type": "EdgeLabelView",
-									"_id": "AAAAAAFwgGYIqQZJZDE=",
-									"_parent": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"model": {
-										"$ref": "AAAAAAFwgGYIqAZGm1k="
-									},
-									"visible": false,
-									"font": "Arial;13;0",
-									"left": 1257,
-									"top": 413,
-									"height": 13,
-									"alpha": 1.5707963267948966,
-									"distance": 15,
-									"hostEdge": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"edgePosition": 1
-								},
-								{
-									"_type": "EdgeLabelView",
-									"_id": "AAAAAAFwgGYIqQZKiSk=",
-									"_parent": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"model": {
-										"$ref": "AAAAAAFwgGYIqAZGm1k="
-									},
-									"visible": null,
-									"font": "Arial;13;0",
-									"left": 1243,
-									"top": 408,
-									"height": 13,
-									"alpha": 1.5707963267948966,
-									"distance": 30,
-									"hostEdge": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"edgePosition": 1
-								},
-								{
-									"_type": "EdgeLabelView",
-									"_id": "AAAAAAFwgGYIqQZLFcg=",
-									"_parent": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"model": {
-										"$ref": "AAAAAAFwgGYIqAZGm1k="
-									},
-									"visible": false,
-									"font": "Arial;13;0",
-									"left": 1286,
-									"top": 422,
-									"height": 13,
-									"alpha": -1.5707963267948966,
-									"distance": 15,
-									"hostEdge": {
-										"$ref": "AAAAAAFwgGYIqQZIRBc="
-									},
-									"edgePosition": 1
-								}
-							],
-							"font": "Arial;13;0",
-							"head": {
-								"$ref": "AAAAAAFwQ/cr+R3X8RU="
-							},
-							"tail": {
-								"$ref": "AAAAAAFwgGTbGwQF2CM="
-							},
-							"lineStyle": 1,
-							"points": "1227:567;1318:282",
-							"showVisibility": true,
-							"nameLabel": {
-								"$ref": "AAAAAAFwgGYIqQZJZDE="
-							},
-							"stereotypeLabel": {
-								"$ref": "AAAAAAFwgGYIqQZKiSk="
-							},
-							"propertyLabel": {
-								"$ref": "AAAAAAFwgGYIqQZLFcg="
-							}
-						},
-						{
-							"_type": "UMLGeneralizationView",
 							"_id": "AAAAAAFwgGYk+AbWjO4=",
 							"_parent": {
 								"$ref": "AAAAAAFF+qBtyKM79qY="
@@ -4292,7 +4198,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFwXMFd5erSmik="
 							},
-							"name": "HTTPModule"
+							"name": "HTTPServer"
 						},
 						{
 							"_type": "UMLOperation",
@@ -4300,7 +4206,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFwXMFd5erSmik="
 							},
-							"name": "configurateRoute",
+							"name": "configurateRoutes",
 							"visibility": "private",
 							"parameters": [
 								{
@@ -4396,8 +4302,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFwXMFi6+sKL5k="
 							},
-							"name": "makeRequest",
-							"stereotype": "",
+							"name": "MakeRequest",
 							"parameters": [
 								{
 									"_type": "UMLParameter",
@@ -4539,7 +4444,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFwXMFi6+sKL5k="
 							},
-							"name": "disconnectFromServer",
+							"name": "RisconnectFromServer",
 							"parameters": [
 								{
 									"_type": "UMLParameter",
@@ -4606,7 +4511,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFwXMjGbfFRSjQ="
 							},
-							"name": "readFile",
+							"name": "ReadFile",
 							"isStatic": true,
 							"parameters": [
 								{

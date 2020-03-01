@@ -57,9 +57,6 @@ class TCPServer: public Server
         return out;
     }
 
-    // ----- Methods
-    virtual JSON toJSON ( ) const;
-
     // ----- Attributes
     const string attribute;
     const string type;
