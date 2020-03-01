@@ -4,7 +4,7 @@ CFLAGS = -Wall \
 		 -ansi \
 		 -pedantic \
 		 -std=c++11 \
-		 -lpthread \
+		 -pthread \
 
 BIN = bin
 SRC = src
