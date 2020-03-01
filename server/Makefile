@@ -21,4 +21,5 @@ $(EXE): $(OFILES)
 	$(CC) $(CFLAGS) -o $(EXE) $(OFILES)
 
 $(BIN)/main.o: $(SRC)/main.cpp
+
 	$(CC) $(CFLAGS) -o $(BIN)/main.o -c $(SRC)/main.cpp
