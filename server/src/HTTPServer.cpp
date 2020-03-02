@@ -29,6 +29,9 @@ HTTPServer::HTTPServer()
     catalogServer = hc::Server( config["ip"].get<string>( ), config["port"].get<ushort>( ) );
 
     configurateRoutes ( );
+
+    // retrieve the catalog content
+    httplib::Client client ( catalogServer.ip, catalogServer.port );
 }
 
 HTTPServer::~HTTPServer()
@@ -37,6 +40,7 @@ HTTPServer::~HTTPServer()
 // ----- Methods
 void HTTPServer::configurateRoutes()
 {
+    // 
     Get(R"(/numbers/(\d+))", [](const httplib::Request &req, httplib::Response &res) {
         cout << req.matches[1] << endl;
         res.set_content("Hello World!", "text/plain");

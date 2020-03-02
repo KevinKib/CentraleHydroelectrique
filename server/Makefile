@@ -5,6 +5,7 @@ CFLAGS = -Wall \
 		 -pedantic \
 		 -std=c++11 \
 		 -pthread \
+		 -g
 
 BIN = bin
 SRC = src
@@ -30,7 +31,7 @@ $(BIN)/FileReader.o: $(INCLUDES)/FileReader.h
 $(BIN)/HTTPServer.o: $(INCLUDES)/HTTPServer.h $(INCLUDES)/Server.h $(INCLUDES)/FileReader.h
 	$(CC) $(CFLAGS) -o $(BIN)/HTTPServer.o -c $(SRC)/HTTPServer.cpp
 
-$(BIN)/main.o: $(SRC)/main.cpp $(INCLUDES)/HTTPServer.h
+$(BIN)/main.o: $(SRC)/main.cpp $(INCLUDES)/HTTPServer.h $(INCLUDES)/TCPServer.h
 	$(CC) $(CFLAGS) -o $(BIN)/main.o -c $(SRC)/main.cpp
 
 

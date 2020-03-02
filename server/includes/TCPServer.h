@@ -25,9 +25,13 @@ class TCPServer: public hc::Server
 
     /**
      * Constructor of the class TCPServer
-     * @param data The raw data for the creation of TCPServer
+     * @param ip The ip of the server
+     * @param port The port of the server
+     * @param attribute The attribute for the server
+     * @param type The type for the server
+     * @param frequency The frequency for the server
      **/
-    TCPServer ( string data );
+    TCPServer ( string ip, ushort port, uint id, string attribute, string type, float frequency, TCPProtocol protocol, string central, string turbine );
 
     /**
      * Constructor of copy of the class TCPServer
@@ -46,23 +50,38 @@ class TCPServer: public hc::Server
     friend ostream & operator << ( ostream & out, const TCPServer & server )
     {
         out 
-            << "Ip : " << server.ip 
-            << ", port : " << server.port
-            << ", attribute : " << server.attribute 
-            << ", type : " << server.type
-            << ", frequency : " << server.frequency
-            << ", is connected : " << server.isConnected
-            << ", protocol : " << server.protocol
+            << "Stream ID=" << server.id
+            << " group=" << server.central << "." << server.turbine
+            << " attribute=" << server.attribute
+            << " type=" << server.type
+            << " address=" << server.ip
+            << " port=" << server.port
+            << " protocol=" << server.protocol
+            << " frequency=" << server.frequency
             << endl;
         return out;
     }
+
+    /**
+     * Create a TCPServer from a raw string.
+     * @param data The raw data
+     * @return The TCPServer according to the data
+     **/
+    static TCPServer fromString ( string data );
 
     // ----- Attributes
     const string attribute;
     const string type;
     const float frequency;
+    const uint id;
     bool isConnected;
     const TCPProtocol protocol;
+    const string central;
+    const string turbine;
+
+    // static attributes
+    static const string TCP_PULL_STRING;
+    static const string TCP_PUSH_STRING; 
 };
 
 #endif
