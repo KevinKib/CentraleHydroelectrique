@@ -107,6 +107,9 @@ TCPServer TCPServer::fromString ( string data )
     } else if (buffer == TCPServer::TCP_PUSH_STRING)
     {
         protocol = TCPProtocol::PUSH;
+    } else
+    {
+        protocol = TCPProtocol::INVALID;
     }
 
     data = data.substr ( index );
