@@ -31,20 +31,27 @@ HTTPServer::HTTPServer()
     configurateRoutes ( );
 
     // retrieve the catalog content
+    // temporary
+    string catalogContent = "ServerAddress: 134.213.23.12\r\nServerPort: 8080\r\nStreamID=1 group=Avignon.Groupe1 attribute=Debit type=RT address=134.213.23.12 port=8012 protocol=TCP_PULL frequency=0.1\r\n";
     httplib::Client client ( catalogServer.ip, catalogServer.port );
+
+
+    catalog = Catalog ( catalogContent );
 }
 
 HTTPServer::~HTTPServer()
 { }
 
 // ----- Methods
-void HTTPServer::configurateRoutes()
+
+void HTTPServer::catalogRoute ( const httplib::Request &req, httplib::Response &res )
 {
-    // 
-    Get(R"(/numbers/(\d+))", [](const httplib::Request &req, httplib::Response &res) {
-        cout << req.matches[1] << endl;
-        res.set_content("Hello World!", "text/plain");
-    });
+    res.set_content ( catalog.toJSON ( ).dump ( ), "application/json" );
+}
+
+void HTTPServer::configurateRoutes()
+{    
+    Get ( "/catalog", [this](const httplib::Request &req, httplib::Response &res) { return catalogRoute(req, res); } );
 }
 
 void HTTPServer::Run ( )

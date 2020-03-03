@@ -5,6 +5,10 @@
 #include "../includes/Catalog.h"
 
 // ----- Constructors
+Catalog::Catalog ( )
+    : serverList ( )
+{ }
+
 Catalog::Catalog ( string catalogContent )
 {
     parseCatalog ( catalogContent );
@@ -34,4 +38,51 @@ void Catalog::parseCatalog ( string catalogContent )
 
         ++count;
     }
+}
+
+JSON Catalog::toJSON ( ) const
+{
+    JSON json, attributesJSON, turbinesJSON, turbineJSON;
+    IDHydrolic central;
+    Attribute attribute;
+    IDTurbine turbine;
+
+    for (pair<IDHydrolic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    {
+        // central -> attribute -> turbins[]
+        central = centralPair.first;
+        unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributeMap = centralPair.second;
+
+        for (pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
+        {
+            // attribute
+            attribute = attributePair.first;
+            unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
+
+            for (pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
+            {
+                // turbine
+                turbine = turbinePair.first;
+                turbinesJSON = JSON ( );
+
+                unordered_map<TCPProtocol, TCPServer> serverMap = turbinePair.second;
+    
+                for (pair<TCPProtocol, TCPServer> serverPair : serverMap )
+                {
+                    TCPServer tcpServer = serverPair.second;
+                    turbineJSON = JSON ( );
+                    turbineJSON["type"] = tcpServer.type;
+                    turbineJSON["frequency"] = tcpServer.frequency;
+
+                    turbinesJSON[turbine] = turbineJSON;
+                }
+            }
+
+            attributesJSON[attribute] = turbinesJSON;
+        }
+
+        json[central] = attributesJSON;
+    }
+
+    return json;
 }

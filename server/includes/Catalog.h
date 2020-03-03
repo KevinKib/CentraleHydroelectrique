@@ -12,6 +12,7 @@
 /** Local imports **/
 #include "typedefs.h"
 #include "TCPServer.h"
+#include "JSONParsable.h"
 
 using namespace std;
 
@@ -20,10 +21,15 @@ using ServerList = unordered_map<IDHydrolic,
                    unordered_map<IDTurbine, 
                    unordered_map<TCPProtocol, TCPServer>>>>; 
 
-class Catalog
+class Catalog : public JSONParsable
 {
     public:
     // ----- Constructors
+
+    /**
+     * default constructor of the class Catalog
+     **/
+    Catalog ( );
 
     /**
      * Constructor of the Catalog
@@ -35,6 +41,24 @@ class Catalog
      * Constructor of the copy of the class Catalog
      **/
     Catalog ( const Catalog & catalog );
+
+    // ----- Operators
+
+    /**
+     * Overload the operator =
+     * @param catalog The catalog to copy
+     * @return The current catalog
+     **/
+    inline Catalog & operator = ( const Catalog & catalog )
+    {
+        serverList = catalog.serverList;
+        return *this;
+    }
+
+    // ----- Methods
+    
+    // @Override
+    virtual JSON toJSON ( ) const;
 
     private:
     // ---- Methods
