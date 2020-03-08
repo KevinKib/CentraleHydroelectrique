@@ -1,11 +1,12 @@
 CC = g++
-CFLAGS = -Wall \
-		 -Werror \
-		 -ansi \
+CFLAGS = -ansi \
 		 -pedantic \
+		 -g \
 		 -std=c++11 \
 		 -pthread \
-		 -g
+		#  -Wall \
+		#  -Werror \
+		 
 
 BIN = bin
 SRC = src
@@ -16,6 +17,7 @@ OFILES = $(BIN)/main.o \
 		 $(BIN)/TCPServer.o \
 		 $(BIN)/FileReader.o \
 		 $(BIN)/HTTPServer.o \
+		 $(BIN)/TCPModule.o \
 
 all: $(EXE)
 
@@ -34,9 +36,11 @@ $(BIN)/HTTPServer.o: $(INCLUDES)/HTTPServer.h $(INCLUDES)/Server.h $(INCLUDES)/F
 $(BIN)/main.o: $(SRC)/main.cpp $(INCLUDES)/HTTPServer.h $(INCLUDES)/TCPServer.h
 	$(CC) $(CFLAGS) -o $(BIN)/main.o -c $(SRC)/main.cpp
 
-
 $(BIN)/TCPServer.o: $(INCLUDES)/TCPServer.h $(INCLUDES)/Server.h
 	$(CC) $(CFLAGS) -o $(BIN)/TCPServer.o -c $(SRC)/TCPServer.cpp
 
 $(BIN)/Server.o: $(INCLUDES)/Server.h
 	$(CC) $(CFLAGS) -o $(BIN)/Server.o -c $(SRC)/Server.cpp
+
+$(BIN)/TCPModule.o: $(INCLUDES)/TCPModule.h $(SRC)/TCPModule.cpp
+	$(CC) $(CFLAGS) -o $(BIN)/TCPModule.o -c $(SRC)/TCPModule.cpp
