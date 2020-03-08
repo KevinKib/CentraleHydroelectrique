@@ -98,6 +98,8 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
     makePullRequest(params, server);
+
+    return true;
 }
 
 bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
@@ -112,7 +114,7 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
 
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
-        cout << "Server disconnected." << endl;
+        cout << "The server is not running." << endl;
         return false;
     }
 
