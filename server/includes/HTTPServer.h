@@ -10,6 +10,7 @@
 /** Personnal includes **/
 #include "typedefs.h"
 #include "Server.h"
+#include "Catalog.h"
 
 #ifndef HTTP_SERVER_H
 #define HTTP_SERVER_H
@@ -44,8 +45,16 @@ class HTTPServer: public httplib::Server
 
     hc::Server catalogServer;
 
+    Catalog catalog;
 
-    // ----- Methods
+    // ----- Methods for the routes
+
+    /**
+     * The function called for the request at the url "/catalog"
+     * @param req The current request
+     * @param res The final result for the request
+     **/
+    void catalogRoute ( const httplib::Request &req, httplib::Response &res );
 
     /**
      * Method to configurate the routes for the server to retrieve data.
