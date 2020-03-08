@@ -1,17 +1,12 @@
-// Client side C/C++ program to demonstrate Socket programming 
 #include <iostream>
-#include <stdio.h> 
-#include <sys/socket.h> 
-#include <arpa/inet.h> 
 #include <unistd.h> 
+#include <stdio.h> 
 #include <string.h> 
 
-// #include <unistd.h>
-#include <stdio.h> 
-// #include <sys/socket.h> 
-#include <stdlib.h> 
+// Sockets
+#include <sys/socket.h> 
+#include <arpa/inet.h> 
 #include <netinet/in.h> 
-#include <string.h> 
 
 using namespace std;
 

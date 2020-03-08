@@ -12,21 +12,17 @@
 //-------------------------------------------------------- Include système
 using namespace std;
 #include <iostream>
+#include <unistd.h>
+#include <stdio.h>  
+#include <stdlib.h> 
+#include <string.h> 
+
+#include <netinet/in.h> 
+#include <sys/socket.h>
+#include <arpa/inet.h> 
 
 //------------------------------------------------------ Include personnel
 #include "../includes/TCPModule.h"
-// #include <WinSock2.h>
-
-#include <unistd.h>
-#include <stdio.h> 
-#include <sys/socket.h> 
-#include <stdlib.h> 
-#include <netinet/in.h> 
-#include <string.h> 
-
-#include <sys/socket.h> 
-#include <arpa/inet.h> 
-// #include <unistd.h> 
 
 //------------------------------------------------------------- Constantes
 
@@ -40,7 +36,7 @@ bool TCPModule::connectToServer(const hc::Server & server)
 {
     // https://www.geeksforgeeks.org/socket-programming-cc/
 
-    cout << "Attempt to connect to following server : " << endl << server << endl;
+    cout << "Attempt to connect to the following server : " << endl << server << endl;
 
     struct sockaddr_in serv_addr; 
 
