@@ -115,6 +115,12 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
     }
 
     // Affichage de la réponse du serveur
+    // Réponse attendue :
+    // {
+    //   Timestamp ts CRLF
+    //   Value val CRLF
+    //   CRLF
+    // }
     cout << "Serveur : " << response << endl;
 
     return true;
@@ -123,6 +129,40 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
 bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
 {
     // TODO : Coder makeHistoricRequest
+    // Envoi d'une requête TCP-PUSH au serveur
+    // Envoi attendu :
+    // {
+    //   GET ID CRLF
+    //   LISTEN_PORT listen_port CRLF
+    //   START_DATE JJ/MM/YYYY HH:mm:ss
+    //   END_DATE JJ/MM/YYYY HH:mm:ss CRLF
+    //   CRLF
+    // }   
+    char pushRequest[1024] = "GET ID CRLF LISTEN_PORT listen_port CRLF START_FATE JJ/MM/YYYY HH:mm:ss END_DATE JJ/MM/YYYY HH:mm:ss CRLF CRLF";
+    send(serv_socket, pushRequest, strlen(pushRequest), 0);
+
+    // On n'attend aucune réponse du serveur (?)
+    // Le serveur se connecte sur le port du client
+
+    // Attente de la réponse du serveur
+    char response[1024] = {0};
+    int read_value = read(serv_socket, response, 1024);
+
+    // On vérifie que le serveur à bien répondu
+    if (read_value == 0) {
+        cout << "The server is not running." << endl;
+        return false;
+    }
+
+    // Affichage de la réponse du serveur
+    // Réponse attendue :
+    // {
+    //   Timestamp ts CRLF
+    //   Value val CRLF
+    //   CRLF
+    // }
+    cout << "Serveur : " << response << endl;
+
     return false;
 }
 
