@@ -63,6 +63,13 @@ class HTTPServer: public httplib::Server
      **/
     void turbinesByCentralRoute ( const httplib::Request & req, httplib::Response res );
 
+    /**
+     * The function called for the request at the url "/historic-data/{centralID}/{turbineID}/{attribute}/{date}"
+     * The request must have four parameters : centralID, turbineID, attribute, date
+     * @param req The current request
+     * @param res The final result for the request
+     **/
+    void historicDataRoute ( const httplib::Request & req, httplib::Response res );
 
     /**
      * Method to configurate the routes for the server to retrieve data.

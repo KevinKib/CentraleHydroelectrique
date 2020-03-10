@@ -49,15 +49,36 @@ HTTPServer::~HTTPServer()
 // ----- Methods
 
 // ----- Routes
-void HTTPServer::hydraulicsRoute ( const httplib::Request &req, httplib::Response &res )
-{
-    res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
-}
-
 void HTTPServer::configurateRoutes()
 {    
-    Get ( "/hydraulics", [this](const httplib::Request &req, httplib::Response &res) { return hydraulicsRoute ( req, res ); } );
-    // Get ( R"(/turbines/((\w[-']?)+))", [this](const httplib::Request &req, httplib::Response &res) { return turbinesByCentralRoute ( req, res ); }  );
+    Get ( "/hydraulics", [&](const httplib::Request &req, httplib::Response &res)
+    { 
+        res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
+    } );
+
+
+    Get ( "/historic-data",
+        [&](const httplib::Request &req, httplib::Response &res)
+        { 
+            JSON result;
+        // retrieve the central, turbine, attribute and date
+        auto centralIterator = req.params.find ( "centralID" );
+        auto turbineIterator = req.params.find ( "turbineID" );
+        auto attributeIterator = req.params.find ( "attribute" );
+        auto dateIterator = req.params.find ( "date" );
+
+        if (centralIterator == req.params.end ( ) || 
+            turbineIterator == req.params.end ( ) ||
+            attributeIterator == req.params.end ( ) ||
+            dateIterator == req.params.end (  ) )
+            {
+                // error in the params of the request
+                result["content"] = "Error with the parameters of the request at the path " + req.path; 
+                res.status = 403;
+                res.set_content ( result.dump ( ), "application/json" );
+            }
+        } 
+    );
 }
 
 void HTTPServer::Run ( )
