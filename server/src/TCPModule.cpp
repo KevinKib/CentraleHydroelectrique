@@ -102,8 +102,10 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
-    string pullResponse = makePullRequest(params, server);
-    cout << pullResponse << endl;
+    // string pullResponse = makePullRequest(params, server);
+    // cout << pullResponse << endl;
+
+    makeHistoricRequest(params, server);
 
     return true;
 }
@@ -160,8 +162,18 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     //   END_DATE JJ/MM/YYYY HH:mm:ss CRLF
     //   CRLF
     // }   
-    char pushRequest[1024] = "GET ID CRLF LISTEN_PORT listen_port CRLF START_FATE JJ/MM/YYYY HH:mm:ss END_DATE JJ/MM/YYYY HH:mm:ss CRLF CRLF";
-    send(serv_socket, pushRequest, strlen(pushRequest), 0);
+
+    string listen_port = "8100";
+    string start_date = "09/03/2020 08:00:00";
+    string end_date = "10/03/2020 08:00:00";
+    string id = "1";
+
+    string pushRequest = "GET " + id + " CRLF LISTEN_PORT " + listen_port + " CRLF START_DATE " + start_date + " CRLF END_DATE " + end_date + " CRLF CRLF";
+    send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
+    cout << "Push init message sent." << endl;
+    sleep(1);
+    string startRequest = "START CRLF CRLF";
+    send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
 
     // On n'attend aucune réponse du serveur (?)
     // Le serveur se connecte sur le port du client
