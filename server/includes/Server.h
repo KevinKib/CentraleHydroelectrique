@@ -71,8 +71,10 @@ namespace hc
         /**
          * @return an key for the map.
          **/
-        string GetHashKey ( ) const;
-        
+        inline string GetHashKey ( ) const
+        {
+            return ip + ":" + to_string(port);
+        }
 
         // -------- Attributes
         string ip;
