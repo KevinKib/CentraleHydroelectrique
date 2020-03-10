@@ -23,8 +23,8 @@ void testHTTPServer() {
 
 int main(int argc, const char **argv)
 {   
-    // testHTTPServer();
-    testTCPModule();
+    testHTTPServer();
+    // testTCPModule();
 
     return 0;
 }

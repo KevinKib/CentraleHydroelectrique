@@ -21,7 +21,7 @@ using ServerList = unordered_map<IDHydraulic,
                    unordered_map<IDTurbine, 
                    unordered_map<TCPProtocol, TCPServer>>>>; 
 
-class Catalog : public JSONParsable
+class Catalog
 {
     public:
     // ----- Constructors
@@ -57,9 +57,6 @@ class Catalog : public JSONParsable
 
     // ----- Methods
     
-    // @Override
-    virtual JSON toJSON ( ) const;
-
     /**
      * Get all names of the hydraulics and their turbines in a JSON object.
      * @return A JSON array with the names of the hydraulics and their turbines' names
@@ -74,7 +71,7 @@ class Catalog : public JSONParsable
      * 
      * @return A pair with the server and a bool for the success of the search in the server list.
      **/
-    virtual pair<TCPServer, bool> GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol );
+    virtual pair<TCPServer, bool> GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol ) const;
 
     virtual JSON GetHydraulics ( );
     /**

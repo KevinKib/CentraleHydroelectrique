@@ -44,14 +44,33 @@ void Catalog::parseCatalog ( string catalogContent )
     }
 }
 
-pair<TCPServer, bool> Catalog::GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol )
+pair<TCPServer, bool> Catalog::GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol ) const
 {
     pair<TCPServer, bool> result;
     result.second = false;
 
-    unordered_map<IDTurbine, 
-                   unordered_map<TCPProtocol, TCPServer>> turbineMap = serverList[hydraulic].at ( attribute );
+    // verify if the hydraulic has map in the server list
+    auto hydraulicIterator = serverList.find ( hydraulic );
+    if ( hydraulicIterator == serverList.end ( ) )
+    {
+        // error, hydraulic not found
+        return result;
+    }
+    
+    unordered_map<Attribute, 
+        unordered_map<IDTurbine, 
+        unordered_map<TCPProtocol, TCPServer>>> hydraulicMap = serverList.at ( hydraulic );
 
+    // verify if the attribute has map in the hydraulic map
+    auto attributeIterator = hydraulicMap.find ( attribute );
+    if (attributeIterator == hydraulicMap.end ( ) )
+    {
+        // error, attribute not found
+        return result;
+    }
+
+    unordered_map<IDTurbine, 
+                   unordered_map<TCPProtocol, TCPServer>> turbineMap = serverList.at ( hydraulic ).at ( attribute );
 
     // try to find the unordered_map<TCPProtocol, TCPServer> with turbine argument
     unordered_map<TCPProtocol, TCPServer> servers;
@@ -63,7 +82,6 @@ pair<TCPServer, bool> Catalog::GetTCPServer ( string hydraulic, string turbine, 
         if ( turbineIterator == turbineMap.end ( ) )
         {
             // return the server with error
-            cout << "first error" << endl;
             return result;
         }
     }
@@ -73,60 +91,12 @@ pair<TCPServer, bool> Catalog::GetTCPServer ( string hydraulic, string turbine, 
     auto serverIterator = servers.find ( protocol );
     if ( serverIterator == servers.end ( ) )
     {
-        cout << "Second erro" << endl;
         // An available server wasn't found, return the server with error
         return result;
     }
 
     pair<TCPServer, bool> final_result ( TCPServer ( serverIterator->second ), true );
     return final_result;
-}
-
-JSON Catalog::toJSON ( ) const
-{
-    JSON json, attributesJSON, turbinesJSON, turbineJSON;
-    IDHydraulic central;
-    Attribute attribute;
-    IDTurbine turbine;
-
-    for ( pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
-    {
-        // central -> attribute -> turbins[]
-        central = centralPair.first;
-        unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributeMap = centralPair.second;
-
-        for ( pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
-        {
-            // attribute
-            attribute = attributePair.first;
-            unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
-
-            for ( pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
-            {
-                // turbine
-                turbine = turbinePair.first;
-                turbinesJSON = JSON ( );
-
-                unordered_map<TCPProtocol, TCPServer> serverMap = turbinePair.second;
-    
-                for (pair<TCPProtocol, TCPServer> serverPair : serverMap )
-                {
-                    TCPServer tcpServer = serverPair.second;
-                    turbineJSON = JSON ( );
-                    turbineJSON["type"] = tcpServer.type;
-                    turbineJSON["frequency"] = tcpServer.frequency;
-
-                    turbinesJSON[turbine] = turbineJSON;
-                }
-            }
-
-            attributesJSON[attribute] = turbinesJSON;
-        }
-
-        json[central] = attributesJSON;
-    }
-
-    return json;
 }
 
 JSON Catalog::GetHydraulics ( )
@@ -161,7 +131,10 @@ JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName )
         for ( pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
         {
             turbine = turbinePair.first;
-            turbineNames.insert ( turbine );
+            if ( turbine != "*" )
+            {
+                turbineNames.insert ( turbine );
+            }
         }
     }
 

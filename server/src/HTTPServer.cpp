@@ -13,7 +13,7 @@ using namespace std;
 
 // ------ Static properties
 const string HTTPServer::CONFIG_FILENAME = "server.config.json";
-const ushort HTTPServer::SERVER_PORT = 8082;
+const ushort HTTPServer::SERVER_PORT = 8070;
 const string HTTPServer::SERVER_IP = "127.0.0.1";
 
 // ----- Constructors
@@ -78,6 +78,7 @@ void HTTPServer::configurateRoutes()
                 {
                     // error in the params of the request
                     result["content"] = "Error with the parameters of the request at the path " + req.path; 
+                    result["success"] = false;
                     res.status = 403;
                     res.set_content ( result.dump ( ), "application/json" );
                     return;
@@ -89,16 +90,22 @@ void HTTPServer::configurateRoutes()
                 string date = dateIterator->second;
 
                 // retrieve the server with the given parameters
-                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PULL );
+                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PUSH );
                 if ( ! tcpServerResult.second )
                 {
-                    result["content"] = "Error during the retrieving of the TCPServer with your params.";
+                    result["content"] = "Error during the retrieving of the TCPServer with your params. Please verify your params";
+                    result["success"] = false;
                     res.set_content ( result.dump ( ), "application/json" );
                     return;
                 }
 
-                result["content"] = "Success";
-                res.set_content ( result.dump( ), "application/json" );
+                // must to retrieve the wanted data
+                if ( tcpServerResult.second )
+                {
+                    result["content"] = "Success";
+                    result["success"] = true;
+                    res.set_content ( result.dump( ), "application/json" );
+                }
         } 
     );
 }
