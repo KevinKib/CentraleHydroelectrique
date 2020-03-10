@@ -31,12 +31,19 @@ HTTPServer::HTTPServer()
     configurateRoutes ( );
 
     // retrieve the catalog content
-    // temporary
-    string catalogContent = "ServerAddress: 134.213.23.12\r\nServerPort: 8080\r\nStreamID=1 group=Avignon.Groupe1 attribute=Debit type=RT address=134.213.23.12 port=8012 protocol=TCP_PULL frequency=0.1\r\n";
     httplib::Client client ( catalogServer.ip, catalogServer.port );
+    auto get = client.Get("/");
 
+    if (!get)
+    {
+        throw runtime_error("Error during the retrieving of catalog");
+    }
+
+    string catalogContent = get->body;
 
     catalog = Catalog ( catalogContent );
+
+    cout << catalog.toJSON () << endl;
 }
 
 HTTPServer::~HTTPServer()
@@ -56,7 +63,7 @@ void HTTPServer::configurateRoutes()
 
 void HTTPServer::Run ( )
 {
-    cout << "Server running with localhost:8080" << endl;
+    cout << "Server running with " << HTTPServer::SERVER_IP << ":" << HTTPServer::SERVER_PORT << endl;
 
-    listen ( "localhost", 8080 );
+    listen ( HTTPServer::SERVER_IP.c_str(), HTTPServer::SERVER_PORT );
 }
