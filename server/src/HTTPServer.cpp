@@ -78,6 +78,7 @@ void HTTPServer::configurateRoutes()
                 {
                     // error in the params of the request
                     result["content"] = "Error with the parameters of the request at the path " + req.path; 
+                    result["success"] = false;
                     res.status = 403;
                     res.set_content ( result.dump ( ), "application/json" );
                     return;
@@ -92,14 +93,17 @@ void HTTPServer::configurateRoutes()
                 pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PULL );
                 if ( ! tcpServerResult.second )
                 {
-                    result["content"] = "Error during the retrieving of the TCPServer with your params.";
+                    result["content"] = "Error during the retrieving of the TCPServer with your params. Please verify your params";
+                    result["success"] = false;
                     res.set_content ( result.dump ( ), "application/json" );
                     return;
                 }
 
+                // must to retrieve the wanted data
                 if ( tcpServerResult.second )
                 {
                     result["content"] = "Success";
+                    result["success"] = true;
                     res.set_content ( result.dump( ), "application/json" );
                 }
         } 
