@@ -53,6 +53,13 @@ class HTTPServer: public httplib::Server
     // ----- Methods for the routes
 
     /**
+     * Permit to retrieve data from the request's params
+     * @param req The current request
+     * @return The TCPResponse corresponding
+     **/
+    TCPResponse proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol ) const;
+
+    /**
      * Method to configurate the routes for the server to retrieve data.
      **/
     void configurateRoutes ( );

@@ -51,6 +51,50 @@ HTTPServer::~HTTPServer()
 
 // ----- Methods
 
+TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol ) const
+{
+    TCPResponse response;
+    // retrieve the central, turbine, attribute and date
+    auto centralIterator = req.params.find ( "hydraulic" );
+    auto turbineIterator = req.params.find ( "turbine" );
+    auto attributeIterator = req.params.find ( "attribute" );
+    auto dateIterator = req.params.find ( "date" );
+
+
+    if (centralIterator == req.params.end ( ) || 
+        turbineIterator == req.params.end ( ) ||
+        attributeIterator == req.params.end ( ) ||
+        dateIterator == req.params.end (  ) )
+    {
+        // error in the params of the request
+        response.second = "Error with the parameters of the request at the path " + req.path; 
+        response.first = false;
+        return response;
+    }
+
+    string hydraulic = centralIterator->second;
+    string turbine = turbineIterator->second;
+    string attribute = attributeIterator->second;
+    string date = dateIterator->second;
+
+
+    // retrieve the server with the given parameters
+    pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, protocol );
+    if ( ! tcpServerResult.second )
+    {
+        response.second = "Error during the retrieving of the TCPServer with your params. Please verify your params";
+        response.first = false;
+        return response;
+    }
+
+    // temporary
+    response.first = true;
+    response.second = "Success";
+
+    return response;
+}
+
+
 // ----- Routes
 void HTTPServer::configurateRoutes()
 {    
@@ -59,54 +103,42 @@ void HTTPServer::configurateRoutes()
         res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
     } );
 
-
+    /**
+     * Waiting params : {
+     *      hydraulic: string,
+     *      turbine: string,
+     *      attribute: string,
+     *      date: uint
+     * }
+     * 
+     **/
     Get ( "/historic-data",
         [&](const httplib::Request &req, httplib::Response &res)
         { 
             JSON result;
-            // retrieve the central, turbine, attribute and date
-            auto centralIterator = req.params.find ( "hydraulic" );
-            auto turbineIterator = req.params.find ( "turbine" );
-            auto attributeIterator = req.params.find ( "attribute" );
-            auto dateIterator = req.params.find ( "date" );
 
+            TCPResponse response = proceedDataRequest ( req, TCPProtocol::PUSH );
 
-            if (centralIterator == req.params.end ( ) || 
-                turbineIterator == req.params.end ( ) ||
-                attributeIterator == req.params.end ( ) ||
-                dateIterator == req.params.end (  ) )
-                {
-                    // error in the params of the request
-                    result["content"] = "Error with the parameters of the request at the path " + req.path; 
-                    result["success"] = false;
-                    res.status = 403;
-                    res.set_content ( result.dump ( ), "application/json" );
-                    return;
-                }
+            result["success"] = response.first;
+            result["content"] = response.second;
+            res.set_content ( result.dump ( ), "application/json" );
+            res.set_header ( "Access-Control-Allow-Origin", "*" );
+        }
+    );
 
-                string hydraulic = centralIterator->second;
-                string turbine = turbineIterator->second;
-                string attribute = attributeIterator->second;
-                string date = dateIterator->second;
+    Get ( "current-data", 
+        [&](const httplib::Request &req, httplib::Response &res)
+        {
+            JSON result;
 
-                // retrieve the server with the given parameters
-                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PUSH );
-                if ( ! tcpServerResult.second )
-                {
-                    result["content"] = "Error during the retrieving of the TCPServer with your params. Please verify your params";
-                    result["success"] = false;
-                    res.set_content ( result.dump ( ), "application/json" );
-                    return;
-                }
+            TCPResponse response = proceedDataRequest ( req, TCPProtocol::PULL );
 
-                // must to retrieve the wanted data
-                if ( tcpServerResult.second )
-                {
-                    result["content"] = "Success";
-                    result["success"] = true;
-                    res.set_content ( result.dump( ), "application/json" );
-                }
-        } 
+            result["success"] = response.first;
+            result["content"] = response.second;
+
+            res.set_content ( result.dump ( ), "application/json" );
+            res.set_header ( "Access-Control-Allow-Origin", "*" );
+        }
     );
 }
 
