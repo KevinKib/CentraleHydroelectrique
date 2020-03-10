@@ -101,6 +101,7 @@ void HTTPServer::configurateRoutes()
     Get ( "/hydraulics", [&](const httplib::Request &req, httplib::Response &res)
     { 
         res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
+        res.set_header ( "Access-Control-Allow-Origin", "*" );
     } );
 
     /**
