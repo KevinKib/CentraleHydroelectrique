@@ -13,7 +13,7 @@ using ushort = unsigned short;
 using uint = unsigned int;
 using JSON = nlohmann::json;
 
-using IDHydrolic = std::string;
+using IDHydraulic = std::string;
 using IDTurbine = std::string;
 using Attribute = std::string;
 

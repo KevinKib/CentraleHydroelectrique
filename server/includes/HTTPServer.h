@@ -50,11 +50,11 @@ class HTTPServer: public httplib::Server
     // ----- Methods for the routes
 
     /**
-     * The function called for the request at the url "/catalog"
+     * The function called for the request at the url "/hydraulics"
      * @param req The current request
      * @param res The final result for the request
      **/
-    void catalogRoute ( const httplib::Request &req, httplib::Response &res );
+    void hydraulicsRoute ( const httplib::Request &req, httplib::Response &res );
 
     /**
      * Method to configurate the routes for the server to retrieve data.

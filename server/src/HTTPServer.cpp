@@ -42,8 +42,6 @@ HTTPServer::HTTPServer()
     string catalogContent = get->body;
 
     catalog = Catalog ( catalogContent );
-
-    cout << catalog.toJSON () << endl;
 }
 
 HTTPServer::~HTTPServer()
@@ -51,14 +49,14 @@ HTTPServer::~HTTPServer()
 
 // ----- Methods
 
-void HTTPServer::catalogRoute ( const httplib::Request &req, httplib::Response &res )
+void HTTPServer::hydraulicsRoute ( const httplib::Request &req, httplib::Response &res )
 {
-    res.set_content ( catalog.toJSON ( ).dump ( ), "application/json" );
+    res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
 }
 
 void HTTPServer::configurateRoutes()
 {    
-    Get ( "/catalog", [this](const httplib::Request &req, httplib::Response &res) { return catalogRoute(req, res); } );
+    Get ( "/hydraulics", [this](const httplib::Request &req, httplib::Response &res) { return hydraulicsRoute(req, res); } );
 }
 
 void HTTPServer::Run ( )

@@ -16,7 +16,7 @@
 
 using namespace std;
 
-using ServerList = unordered_map<IDHydrolic, 
+using ServerList = unordered_map<IDHydraulic, 
                    unordered_map<Attribute, 
                    unordered_map<IDTurbine, 
                    unordered_map<TCPProtocol, TCPServer>>>>; 
@@ -59,6 +59,19 @@ class Catalog : public JSONParsable
     
     // @Override
     virtual JSON toJSON ( ) const;
+
+    /**
+     * Get all names of the hydraulics in a JSON array.
+     * @return A JSON array with all names
+     */
+    virtual JSON GetHydraulics ( ) const;
+
+    /**
+     * Get the information of all turbins by an hydraulic name
+     * @param hydraulicName The name of the hydrolic
+     * @return A JSON array with information of each turbine
+     **/
+    virtual JSON GetTurbinesByHydraulicName ( string hydraulicName ) const;
 
     private:
     // ---- Methods
