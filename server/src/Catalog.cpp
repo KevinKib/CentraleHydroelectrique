@@ -44,6 +44,44 @@ void Catalog::parseCatalog ( string catalogContent )
     }
 }
 
+pair<TCPServer, bool> Catalog::GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol )
+{
+    pair<TCPServer, bool> result;
+    result.second = false;
+
+    unordered_map<IDTurbine, 
+                   unordered_map<TCPProtocol, TCPServer>> turbineMap = serverList[hydraulic].at ( attribute );
+
+
+    // try to find the unordered_map<TCPProtocol, TCPServer> with turbine argument
+    unordered_map<TCPProtocol, TCPServer> servers;
+    auto turbineIterator = turbineMap.find ( "*" );
+    if ( turbineIterator == turbineMap.end ( ) )
+    {
+        // try to find with star argument
+        turbineIterator = turbineMap.find ( turbine );
+        if ( turbineIterator == turbineMap.end ( ) )
+        {
+            // return the server with error
+            cout << "first error" << endl;
+            return result;
+        }
+    }
+
+    servers = turbineIterator->second;
+    // try to find the server according to the protocol
+    auto serverIterator = servers.find ( protocol );
+    if ( serverIterator == servers.end ( ) )
+    {
+        cout << "Second erro" << endl;
+        // An available server wasn't found, return the server with error
+        return result;
+    }
+
+    pair<TCPServer, bool> final_result ( TCPServer ( serverIterator->second ), true );
+    return final_result;
+}
+
 JSON Catalog::toJSON ( ) const
 {
     JSON json, attributesJSON, turbinesJSON, turbineJSON;

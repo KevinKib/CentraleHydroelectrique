@@ -64,6 +64,18 @@ class Catalog : public JSONParsable
      * Get all names of the hydraulics and their turbines in a JSON object.
      * @return A JSON array with the names of the hydraulics and their turbines' names
      */
+
+    /**
+     * Get a TCP server from his information.
+     * @param hydraulic The name of the hydraulic.
+     * @param turbine The name of the turbine.
+     * @param attribute The attribute wanted.
+     * @param protocol The protocol wanted.
+     * 
+     * @return A pair with the server and a bool for the success of the search in the server list.
+     **/
+    virtual pair<TCPServer, bool> GetTCPServer ( string hydraulic, string turbine, string attribute, TCPProtocol protocol );
+
     virtual JSON GetHydraulics ( );
     /**
      * Get the information of all turbins by an hydraulic name

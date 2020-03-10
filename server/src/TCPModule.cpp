@@ -41,8 +41,8 @@ using namespace std;
 
 bool TCPModule::connectToServer(const hc::Server & server)
 {
+    
     // https://www.geeksforgeeks.org/socket-programming-cc/
-
     cout << "Attempt to connect to the following server : " << endl << server << endl;
 
     struct sockaddr_in serv_addr; 
@@ -50,7 +50,7 @@ bool TCPModule::connectToServer(const hc::Server & server)
     // On crée un socket.
     int serv_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (serv_socket < 0) { 
-        cout << "Socket creation error." << endl;
+        cerr << "Socket creation error." << endl;
         return false; 
     } 
    
@@ -59,18 +59,22 @@ bool TCPModule::connectToServer(const hc::Server & server)
        
     if(inet_pton(AF_INET, server.ip.c_str(), &serv_addr.sin_addr)<=0)  
     { 
-        cout << "Invalid address/ Address not supported" << endl;
+        cerr << "Invalid address/ Address not supported" << endl;
         return false;
     } 
 
     int connect_val = connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (connect_val < 0) 
     { 
-        cout << "Connection failed." << endl;
+        cerr << "Connection failed." << endl;
         return false;
     } 
     
     // La connexion a réussi.
+    string key = server.GetKey ( );
+
+    sockets[key] = serv_socket;
+
     return true; 
 }
 
@@ -93,7 +97,7 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Si l'on est toujours pas connecté, alors on signale que la requête à échoué.
     if (!isConnected) {
-        cout << "Could not connect to server." << endl;
+        cerr << "Could not connect to server." << endl;
         return false;
     }
 
@@ -110,6 +114,10 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
 {
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS CRLF CRLF";
+
+    string key = server.GetKey ( );
+    int serv_socket = sockets[key];
+
     send(serv_socket, pullRequest, strlen(pullRequest), 0);
 
     // Attente de la réponse du serveur
@@ -146,6 +154,10 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     //   END_DATE JJ/MM/YYYY HH:mm:ss CRLF
     //   CRLF
     // }   
+
+    string key = server.GetKey ( );
+
+    int serv_socket = sockets[key];
     char pushRequest[1024] = "GET ID CRLF LISTEN_PORT listen_port CRLF START_FATE JJ/MM/YYYY HH:mm:ss END_DATE JJ/MM/YYYY HH:mm:ss CRLF CRLF";
     send(serv_socket, pushRequest, strlen(pushRequest), 0);
 
@@ -186,6 +198,7 @@ JSON TCPModule::parseResponse(string & data)
 TCPModule::TCPModule ( const TCPModule & unTCPModule )
 // Algorithme :
 //
+    : sockets ( unTCPModule.sockets )
 {
 #ifdef MAP
     cout << "Appel au constructeur de copie de <TCPModule>" << endl;
@@ -198,6 +211,7 @@ TCPModule::TCPModule ( const TCPModule & unTCPModule )
 TCPModule::TCPModule ( )
 // Algorithme :
 //
+    : sockets ( )
 {
 #ifdef MAP
     cout << "Appel au constructeur de <TCPModule>" << endl;

@@ -10,6 +10,7 @@
 #if ! defined ( TCPMODULE_H )
 #define TCPMODULE_H
 //--------------------------------------------------- Interfaces utilisées
+#include <map>
 
 #include "../libs/json/single_include/nlohmann/json.hpp"
 #include "Server.h"
@@ -62,7 +63,12 @@ protected:
 
     bool makeHistoricRequest(JSON params, const hc::Server & server);
     // Réalise une requête d'historique sur une centrale.
-    
+
+    /**
+     * Connect to a TCP server
+     * @param server The target server to connect with it
+     * @return true if the connection has failed, else true
+     **/
     bool connectToServer(const hc::Server & server);
     // Gère la connection à un serveur contenant des informations
     // sur une centrale hydraulique.
@@ -75,9 +81,9 @@ protected:
 
 //----------------------------------------------------- Attributs protégés
 
-    // unordered_map<hc::Server, int> map_server_socket;
+    // map with key ip:port and the value is the corresponding socket
+    unordered_map<string, int> sockets;
     bool isConnected;
-    int serv_socket;
 };
 
 //--------------------------- Autres définitions dépendantes de <TCPModule>

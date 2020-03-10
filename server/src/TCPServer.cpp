@@ -8,6 +8,20 @@ const string TCPServer::TCP_PULL_STRING = "TCP_PULL";
 const string TCPServer::TCP_PUSH_STRING = "TCP_PUSH";
 
 // ----- Constructors
+TCPServer::TCPServer ( )
+    : Server ( "", 0 ),
+    attribute ( "" ),
+    type ( "" ),
+    frequency ( -1.0f ),
+    id ( 0 ),
+    isConnected ( false ),
+    protocol ( TCPProtocol::INVALID ),
+    central ( "" ),
+    turbine ( "" )
+{
+
+}
+
 TCPServer::TCPServer ( string ip, ushort port, uint _id, string _attribute, string _type, float _frequency, TCPProtocol _protocol, string _central, string _turbine )
     : Server ( ip, port ),
     attribute ( _attribute ),

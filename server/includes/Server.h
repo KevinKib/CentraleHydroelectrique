@@ -66,6 +66,18 @@ namespace hc
             return *this;
         }
 
+        // ------ Methods
+
+        /**
+         * @return an key for the map.
+         **/
+        inline string GetKey ( ) const
+        {
+            string key = ip + ":";
+            key += port;
+            return key;
+        }
+
         // -------- Attributes
         string ip;
         ushort port;
