@@ -33,7 +33,7 @@ public:
     // Envoie une requête afin d'obtenir des informations
     // d'un serveur.
 
-    // bool DisconnectFromServer(const hc::Server & server);
+    bool DisconnectFromServer(const hc::Server & server);
     // Gère la déconnection d'un serveur.
 
 //------------------------------------------------- Surcharge d'opérateurs
@@ -56,7 +56,7 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-    bool makePullRequest(JSON params, const hc::Server & server);
+    string makePullRequest(JSON params, const hc::Server & server);
     // Réalise une requête d'informations en temps réel
     // sur une centrale hydraulique.
 
