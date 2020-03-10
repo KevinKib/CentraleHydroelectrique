@@ -46,11 +46,11 @@ void Catalog::parseCatalog ( string catalogContent )
 JSON Catalog::toJSON ( ) const
 {
     JSON json, attributesJSON, turbinesJSON, turbineJSON;
-    IDHydrolic central;
+    IDHydraulic central;
     Attribute attribute;
     IDTurbine turbine;
 
-    for (pair<IDHydrolic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
     {
         // central -> attribute -> turbins[]
         central = centralPair.first;
@@ -88,4 +88,57 @@ JSON Catalog::toJSON ( ) const
     }
 
     return json;
+}
+
+JSON Catalog::GetHydraulics ( ) const
+{
+    JSON array = JSON::array ( );
+    JSON object;
+
+    for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    {
+        array.push_back( centralPair.first );
+    }
+
+
+    object["hydraulics"] = array;
+    return object;
+}
+
+JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName ) const
+{
+    JSON array = JSON::array ( );
+    IDHydraulic central;
+    Attribute attribute;
+    IDTurbine turbine;
+
+    for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    {
+        // central -> attribute -> turbins[]
+        central = centralPair.first;
+        unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributeMap = centralPair.second;
+
+        for (pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
+        {
+            // attribute
+            attribute = attributePair.first;
+            unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
+
+            for (pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
+            {
+                // turbine
+                turbine = turbinePair.first;
+                JSON turbineJSON;
+
+                unordered_map<TCPProtocol, TCPServer> turbineMap = turbinePair.second;
+                TCPServer & server = turbineMap.at(TCPProtocol::PULL);
+                turbineJSON["name"] = turbine;
+                turbineJSON["frequency"] = server.frequency;
+
+                array.push_back ( turbineJSON );
+            }
+        }
+    }
+    
+    return array;
 }
