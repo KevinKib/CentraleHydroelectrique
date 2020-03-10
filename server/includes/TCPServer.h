@@ -23,6 +23,8 @@ class TCPServer: public hc::Server
     public:
     // ----- Constructors
 
+    // Default constructor
+    TCPServer ( );
     /**
      * Constructor of the class TCPServer
      * @param ip The ip of the server

@@ -1,6 +1,8 @@
 /** System/libs imports **/
 #include <string>
 #include <iostream>
+#include <utility>
+
 #include "../libs/json/single_include/nlohmann/json.hpp"
 
 /** Local imports**/
@@ -16,6 +18,7 @@ const string HTTPServer::SERVER_IP = "127.0.0.1";
 
 // ----- Constructors
 HTTPServer::HTTPServer()
+    : tcp ( )
 {
     // read the config file
     string data = FileReader::ReadFile ( HTTPServer::CONFIG_FILENAME );
@@ -61,22 +64,41 @@ void HTTPServer::configurateRoutes()
         [&](const httplib::Request &req, httplib::Response &res)
         { 
             JSON result;
-        // retrieve the central, turbine, attribute and date
-        auto centralIterator = req.params.find ( "centralID" );
-        auto turbineIterator = req.params.find ( "turbineID" );
-        auto attributeIterator = req.params.find ( "attribute" );
-        auto dateIterator = req.params.find ( "date" );
+            // retrieve the central, turbine, attribute and date
+            auto centralIterator = req.params.find ( "hydraulic" );
+            auto turbineIterator = req.params.find ( "turbine" );
+            auto attributeIterator = req.params.find ( "attribute" );
+            auto dateIterator = req.params.find ( "date" );
 
-        if (centralIterator == req.params.end ( ) || 
-            turbineIterator == req.params.end ( ) ||
-            attributeIterator == req.params.end ( ) ||
-            dateIterator == req.params.end (  ) )
-            {
-                // error in the params of the request
-                result["content"] = "Error with the parameters of the request at the path " + req.path; 
-                res.status = 403;
-                res.set_content ( result.dump ( ), "application/json" );
-            }
+
+            if (centralIterator == req.params.end ( ) || 
+                turbineIterator == req.params.end ( ) ||
+                attributeIterator == req.params.end ( ) ||
+                dateIterator == req.params.end (  ) )
+                {
+                    // error in the params of the request
+                    result["content"] = "Error with the parameters of the request at the path " + req.path; 
+                    res.status = 403;
+                    res.set_content ( result.dump ( ), "application/json" );
+                    return;
+                }
+
+                string hydraulic = centralIterator->second;
+                string turbine = turbineIterator->second;
+                string attribute = attributeIterator->second;
+                string date = dateIterator->second;
+
+                // retrieve the server with the given parameters
+                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PULL );
+                if ( ! tcpServerResult.second )
+                {
+                    result["content"] = "Error during the retrieving of the TCPServer with your params.";
+                    res.set_content ( result.dump ( ), "application/json" );
+                    return;
+                }
+
+                result["content"] = "Success";
+                res.set_content ( result.dump( ), "application/json" );
         } 
     );
 }

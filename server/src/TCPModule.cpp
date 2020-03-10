@@ -20,7 +20,6 @@ using namespace std;
 #include <netinet/in.h> 
 #include <sys/socket.h>
 #include <arpa/inet.h> 
-#include <errno.h>
 
 //------------------------------------------------------ Include personnel
 #include "../includes/TCPModule.h"
@@ -42,16 +41,16 @@ using namespace std;
 
 bool TCPModule::connectToServer(const hc::Server & server)
 {
+    
     // https://www.geeksforgeeks.org/socket-programming-cc/
-
     cout << "Attempt to connect to the following server : " << endl << server << endl;
 
     struct sockaddr_in serv_addr; 
 
     // On crée un socket.
-    serv_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int serv_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (serv_socket < 0) { 
-        cout << "Socket creation error." << endl;
+        cerr << "Socket creation error." << endl;
         return false; 
     } 
    
@@ -60,30 +59,34 @@ bool TCPModule::connectToServer(const hc::Server & server)
        
     if(inet_pton(AF_INET, server.ip.c_str(), &serv_addr.sin_addr)<=0)  
     { 
-        cout << "Invalid address/ Address not supported" << endl;
+        cerr << "Invalid address/ Address not supported" << endl;
         return false;
     } 
 
     int connect_val = connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (connect_val < 0) 
     { 
-        cout << "Connection failed." << endl;
+        cerr << "Connection failed." << endl;
         return false;
     } 
     
     // La connexion a réussi.
+    string key = server.GetKey ( );
+
+    sockets[key] = serv_socket;
+
     return true; 
 }
 
-bool TCPModule::DisconnectFromServer(const hc::Server & server)
-{
-    // Envoie une requête de déconnexion au serveur.
-    char disconnectRequest[1024] = "END CRLF CRLF";
-    send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
+// bool TCPModule::DisconnectFromServer(const hc::Server & server)
+// {
+//     // Envoie une requête de déconnexion au serveur.
+//     char disconnectRequest[1024] = "END CRLF CRLF";
+//     send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
 
-    // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
-    return true;
-}
+//     // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
+//     return true;
+// }
 
 bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 {
@@ -94,7 +97,7 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Si l'on est toujours pas connecté, alors on signale que la requête à échoué.
     if (!isConnected) {
-        cout << "Could not connect to server." << endl;
+        cerr << "Could not connect to server." << endl;
         return false;
     }
 
@@ -102,52 +105,44 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
-    // string pullResponse = makePullRequest(params, server);
-    // cout << pullResponse << endl;
+    string pullResponse = makePullRequest(params, server);
+    cout << pullResponse << endl;
 
-    makeHistoricRequest(params, server);
+    // makeHistoricRequest(params, server);
 
     return true;
 }
 
-string TCPModule::makePullRequest(JSON params, const hc::Server & server)
+bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
 {
+    // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS CRLF CRLF";
+
+    string key = server.GetKey ( );
+    int serv_socket = sockets[key];
+
+    send(serv_socket, pullRequest, strlen(pullRequest), 0);
+
+    // Attente de la réponse du serveur
     char response[1024] = {0};
-    char error[1024] = {0};
-
-    int send_value = send(serv_socket, pullRequest, strlen(pullRequest), 0);
-    
-    // On vérifie que le message s'est bien envoyé.
-    if (send_value == -1) {
-        cout << "Send error. Errno = " << errno << "." << endl;
-        return error;
-    }
-
     int read_value = read(serv_socket, response, 1024);
 
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
         cout << "The server is not running." << endl;
-        return error;
-    }
-    else if (read_value == -1) {
-        cout << "Read error. Errno = " << errno << "." << endl;
-        return error;
+        return false;
     }
 
-    /* 
-    Affichage de la réponse du serveur
-    Réponse attendue :
-    {
-        Timestamp ts CRLF
-        Value val CRLF
-        CRLF
-    } 
-    */
-    string response_str = response;
+    // Affichage de la réponse du serveur
+    // Réponse attendue :
+    // {
+    //   Timestamp ts CRLF
+    //   Value val CRLF
+    //   CRLF
+    // }
+    cout << "Serveur : " << response << endl;
 
-    return response_str;
+    return true;
 }
 
 bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
@@ -174,6 +169,9 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     sleep(1);
     string startRequest = "START CRLF CRLF";
     send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
+
+    // string key = server.GetKey ( );
+    // int serv_socket = sockets[key];
 
     // On n'attend aucune réponse du serveur (?)
     // Le serveur se connecte sur le port du client
@@ -212,6 +210,7 @@ JSON TCPModule::parseResponse(string & data)
 TCPModule::TCPModule ( const TCPModule & unTCPModule )
 // Algorithme :
 //
+    : sockets ( unTCPModule.sockets )
 {
 #ifdef MAP
     cout << "Appel au constructeur de copie de <TCPModule>" << endl;
@@ -224,6 +223,7 @@ TCPModule::TCPModule ( const TCPModule & unTCPModule )
 TCPModule::TCPModule ( )
 // Algorithme :
 //
+    : sockets ( )
 {
 #ifdef MAP
     cout << "Appel au constructeur de <TCPModule>" << endl;

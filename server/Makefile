@@ -34,7 +34,8 @@ $(BIN)/Catalog.o: $(INCLUDES)/Catalog.h $(SRC)/Catalog.cpp $(INCLUDES)/TCPServer
 $(BIN)/FileReader.o: $(INCLUDES)/FileReader.h $(SRC)/FileReader.cpp
 	$(CC) $(CFLAGS) -o $(BIN)/FileReader.o -c $(SRC)/FileReader.cpp
 
-$(BIN)/HTTPServer.o: $(INCLUDES)/HTTPServer.h $(SRC)/HTTPServer.cpp $(INCLUDES)/Server.h $(INCLUDES)/FileReader.h $(INCLUDES)/Catalog.h
+$(BIN)/HTTPServer.o: $(INCLUDES)/HTTPServer.h $(SRC)/HTTPServer.cpp $(INCLUDES)/Server.h $(INCLUDES)/FileReader.h $(INCLUDES)/Catalog.h \
+				     $(INCLUDES)/TCPModule.h
 	$(CC) $(CFLAGS) -o $(BIN)/HTTPServer.o -c $(SRC)/HTTPServer.cpp
 
 $(BIN)/main.o: $(SRC)/main.cpp $(INCLUDES)/HTTPServer.h $(INCLUDES)/TCPServer.h

@@ -11,6 +11,7 @@
 #include "typedefs.h"
 #include "Server.h"
 #include "Catalog.h"
+#include "TCPModule.h"
 
 #ifndef HTTP_SERVER_H
 #define HTTP_SERVER_H
@@ -46,6 +47,8 @@ class HTTPServer: public httplib::Server
     hc::Server catalogServer;
 
     Catalog catalog;
+
+    TCPModule tcp;
 
     // ----- Methods for the routes
 
