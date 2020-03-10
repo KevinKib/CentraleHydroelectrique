@@ -8,12 +8,12 @@
 using namespace std;
 
 void testTCPModule() {
-    hc::Server testServer("127.0.0.1", 8080);
+    // hc::Server testServer("127.0.0.1", 8100);
     hc::Server dorianServer("", 8080);
     hc::Server avignon("127.0.0.1", 8088);
-    hc::Server avignon_2("127.0.0.1", 11113);
+    // hc::Server avignon("127.0.0.1", 11113);
     TCPModule tcpModule;
-    tcpModule.MakeRequest(nullptr, avignon_2);
+    tcpModule.MakeRequest(nullptr, avignon);
 }
 
 void testHTTPServer() {
