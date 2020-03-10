@@ -32,6 +32,11 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 
+bool TCPModule::isConnected(const hc::Server server)
+{
+    
+}
+
 bool TCPModule::connectToServer(const hc::Server & server)
 {
     // https://www.geeksforgeeks.org/socket-programming-cc/
@@ -41,7 +46,7 @@ bool TCPModule::connectToServer(const hc::Server & server)
     struct sockaddr_in serv_addr; 
 
     // On crée un socket.
-    serv_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int serv_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (serv_socket < 0) { 
         cout << "Socket creation error." << endl;
         return false; 
@@ -183,8 +188,7 @@ TCPModule::TCPModule ( const TCPModule & unTCPModule )
     cout << "Appel au constructeur de copie de <TCPModule>" << endl;
 #endif
 
-    serv_socket = unTCPModule.serv_socket;
-    isConnected = unTCPModule.isConnected;
+    map_server_socket = unTCPModule.map_server_socket;
 
 } //----- Fin de TCPModule (constructeur de copie)
 
@@ -196,8 +200,7 @@ TCPModule::TCPModule ( )
     cout << "Appel au constructeur de <TCPModule>" << endl;
 #endif
 
-    serv_socket = 0;
-    isConnected = false;
+    map_server_socket = {};
 
 } //----- Fin de TCPModule
 

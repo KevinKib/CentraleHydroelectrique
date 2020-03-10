@@ -21,7 +21,12 @@ void testHTTPServer() {
 
 int main(int argc, const char **argv)
 {   
+<<<<<<< HEAD
+    testTCPModule();
+    // testHTTPServer();
+=======
     testHTTPServer();
+>>>>>>> d0300fc45b5224607fedcab0d42d9c5b70bc3b43
 
     return 0;
 }

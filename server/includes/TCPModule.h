@@ -70,12 +70,12 @@ protected:
     JSON parseResponse(string & data);
     // Transforme une réponse d'un serveur en un objet de format JSON.
 
+    bool isConnected(hc::Server server);
+    // Retourne true si le serveur passé en paramètre est connecté ou non.
+
 //----------------------------------------------------- Attributs protégés
 
-    // unordered_map<hc::Server, int> map_server_socket;
-
-    int serv_socket;
-    bool isConnected;
+    unordered_map<hc::Server, int> map_server_socket;
 };
 
 //--------------------------- Autres définitions dépendantes de <TCPModule>
