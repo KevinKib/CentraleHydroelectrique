@@ -90,7 +90,7 @@ void HTTPServer::configurateRoutes()
                 string date = dateIterator->second;
 
                 // retrieve the server with the given parameters
-                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PULL );
+                pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, TCPProtocol::PUSH );
                 if ( ! tcpServerResult.second )
                 {
                     result["content"] = "Error during the retrieving of the TCPServer with your params. Please verify your params";
