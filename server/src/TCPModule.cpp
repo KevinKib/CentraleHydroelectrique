@@ -32,10 +32,12 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 
-bool TCPModule::isConnected(const hc::Server server)
-{
-    
-}
+// bool TCPModule::isConnected(const hc::Server server)
+// {
+//     unordered_map<hc::Server, int>::iterator it = map_server_socket.find(server);
+
+//     return (it != map_server_socket.end());
+// }
 
 bool TCPModule::connectToServer(const hc::Server & server)
 {
@@ -60,8 +62,9 @@ bool TCPModule::connectToServer(const hc::Server & server)
         cout << "Invalid address/ Address not supported" << endl;
         return false;
     } 
-   
-    if (connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+
+    int connect_val = connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if (connect_val < 0) 
     { 
         cout << "Connection failed." << endl;
         return false;
@@ -71,15 +74,15 @@ bool TCPModule::connectToServer(const hc::Server & server)
     return true; 
 }
 
-bool TCPModule::DisconnectFromServer(const hc::Server & server)
-{
-    // Envoie une requête de déconnexion au serveur.
-    char disconnectRequest[1024] = "END CRLF CRLF";
-    send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
+// bool TCPModule::DisconnectFromServer(const hc::Server & server)
+// {
+//     // Envoie une requête de déconnexion au serveur.
+//     char disconnectRequest[1024] = "END CRLF CRLF";
+//     send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
 
-    // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
-    return true;
-}
+//     // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
+//     return true;
+// }
 
 bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 {
@@ -98,7 +101,7 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
-    makePullRequest(params, server);
+    // makePullRequest(params, server);
 
     return true;
 }
@@ -188,7 +191,7 @@ TCPModule::TCPModule ( const TCPModule & unTCPModule )
     cout << "Appel au constructeur de copie de <TCPModule>" << endl;
 #endif
 
-    map_server_socket = unTCPModule.map_server_socket;
+    // map_server_socket = unTCPModule.map_server_socket;
 
 } //----- Fin de TCPModule (constructeur de copie)
 
@@ -199,8 +202,6 @@ TCPModule::TCPModule ( )
 #ifdef MAP
     cout << "Appel au constructeur de <TCPModule>" << endl;
 #endif
-
-    map_server_socket = {};
 
 } //----- Fin de TCPModule
 

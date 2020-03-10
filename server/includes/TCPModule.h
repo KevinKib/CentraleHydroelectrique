@@ -33,7 +33,7 @@ public:
     // Envoie une requête afin d'obtenir des informations
     // d'un serveur.
 
-    bool DisconnectFromServer(const hc::Server & server);
+    // bool DisconnectFromServer(const hc::Server & server);
     // Gère la déconnection d'un serveur.
 
 //------------------------------------------------- Surcharge d'opérateurs
@@ -70,12 +70,14 @@ protected:
     JSON parseResponse(string & data);
     // Transforme une réponse d'un serveur en un objet de format JSON.
 
-    bool isConnected(hc::Server server);
+    // bool isConnected(hc::Server server);
     // Retourne true si le serveur passé en paramètre est connecté ou non.
 
 //----------------------------------------------------- Attributs protégés
 
-    unordered_map<hc::Server, int> map_server_socket;
+    // unordered_map<hc::Server, int> map_server_socket;
+    bool isConnected;
+    int serv_socket;
 };
 
 //--------------------------- Autres définitions dépendantes de <TCPModule>
