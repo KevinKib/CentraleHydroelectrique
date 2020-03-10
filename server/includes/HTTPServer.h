@@ -57,6 +57,14 @@ class HTTPServer: public httplib::Server
     void hydraulicsRoute ( const httplib::Request &req, httplib::Response &res );
 
     /**
+     * The function called for the request at the url "/turbines{centralID}"
+     * @param req The current request
+     * @param res The final result for the request
+     **/
+    void turbinesByCentralRoute ( const httplib::Request & req, httplib::Response res );
+
+
+    /**
      * Method to configurate the routes for the server to retrieve data.
      **/
     void configurateRoutes ( );

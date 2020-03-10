@@ -71,7 +71,7 @@ class Catalog : public JSONParsable
      * @param hydraulicName The name of the hydrolic
      * @return A JSON array with information of each turbine
      **/
-    virtual JSON GetTurbinesByHydraulicName ( string hydraulicName ) const;
+    virtual JSON GetTurbinesByHydraulicName ( string hydraulicName );
 
     private:
     // ---- Methods

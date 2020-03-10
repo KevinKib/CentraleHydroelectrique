@@ -50,19 +50,19 @@ JSON Catalog::toJSON ( ) const
     Attribute attribute;
     IDTurbine turbine;
 
-    for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    for ( pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
     {
         // central -> attribute -> turbins[]
         central = centralPair.first;
         unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributeMap = centralPair.second;
 
-        for (pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
+        for ( pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
         {
             // attribute
             attribute = attributePair.first;
             unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
 
-            for (pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
+            for ( pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
             {
                 // turbine
                 turbine = turbinePair.first;
@@ -105,40 +105,37 @@ JSON Catalog::GetHydraulics ( ) const
     return object;
 }
 
-JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName ) const
+JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName )
 {
     JSON array = JSON::array ( );
-    IDHydraulic central;
+    JSON object, current_turbine;
     Attribute attribute;
     IDTurbine turbine;
 
-    for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
+    unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> centralMap = serverList.at ( hydraulicName );
+
+    for ( pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : centralMap )
     {
-        // central -> attribute -> turbins[]
-        central = centralPair.first;
-        unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributeMap = centralPair.second;
+        unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
 
-        for (pair<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> attributePair : attributeMap )
+        for ( pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
         {
-            // attribute
-            attribute = attributePair.first;
-            unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbineMap = attributePair.second;
+            turbine = turbinePair.first;
 
-            for (pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
+            for ( pair<TCPProtocol, TCPServer> serverPair : turbinePair.second )
             {
-                // turbine
-                turbine = turbinePair.first;
-                JSON turbineJSON;
+                TCPServer server = serverPair.second;
 
-                unordered_map<TCPProtocol, TCPServer> turbineMap = turbinePair.second;
-                TCPServer & server = turbineMap.at(TCPProtocol::PULL);
-                turbineJSON["name"] = turbine;
-                turbineJSON["frequency"] = server.frequency;
+                current_turbine = JSON ( );
 
-                array.push_back ( turbineJSON );
+                current_turbine["frequency"] = server.frequency;
+                current_turbine["name"] = turbine;
+
+                array.push_back ( current_turbine );
             }
         }
     }
-    
-    return array;
+
+    object["data"] = array;
+    return object;
 }
