@@ -1,5 +1,6 @@
 /** System imports **/
 #include <sstream>
+#include <set>
 
 /** Local imports **/
 #include "../includes/Catalog.h"
@@ -90,27 +91,28 @@ JSON Catalog::toJSON ( ) const
     return json;
 }
 
-JSON Catalog::GetHydraulics ( ) const
+JSON Catalog::GetHydraulics ( )
 {
-    JSON array = JSON::array ( );
-    JSON object;
+    JSON result, object;
 
     for (pair<IDHydraulic, unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>>> centralPair : serverList )
     {
-        array.push_back( centralPair.first );
+        JSON turbinesJSON = GetTurbinesByHydraulicName ( centralPair.first );
+        result[centralPair.first] = turbinesJSON["data"];
     }
 
 
-    object["data"] = array;
+    object["data"] = result;
     return object;
 }
 
 JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName )
 {
     JSON array = JSON::array ( );
-    JSON object, current_turbine;
+    JSON object;
     Attribute attribute;
     IDTurbine turbine;
+    set<string> turbineNames;
 
     unordered_map<Attribute, unordered_map<IDTurbine, unordered_map<TCPProtocol, TCPServer>>> centralMap = serverList.at ( hydraulicName );
 
@@ -121,21 +123,10 @@ JSON Catalog::GetTurbinesByHydraulicName ( string hydraulicName )
         for ( pair<IDTurbine, unordered_map<TCPProtocol, TCPServer>> turbinePair : turbineMap )
         {
             turbine = turbinePair.first;
-
-            for ( pair<TCPProtocol, TCPServer> serverPair : turbinePair.second )
-            {
-                TCPServer server = serverPair.second;
-
-                current_turbine = JSON ( );
-
-                current_turbine["frequency"] = server.frequency;
-                current_turbine["name"] = turbine;
-
-                array.push_back ( current_turbine );
-            }
+            turbineNames.insert ( turbine );
         }
     }
 
-    object["data"] = array;
+    object["data"] = turbineNames;
     return object;
 }

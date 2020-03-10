@@ -40,7 +40,6 @@ HTTPServer::HTTPServer()
     }
 
     string catalogContent = get->body;
-
     catalog = Catalog ( catalogContent );
 }
 
@@ -55,21 +54,10 @@ void HTTPServer::hydraulicsRoute ( const httplib::Request &req, httplib::Respons
     res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
 }
 
-void HTTPServer::turbinesByCentralRoute ( const httplib::Request & req, httplib::Response res )
-{
-    // retrieve the params of central
-    IDHydraulic hydraulic = req.matches[1];
-
-    JSON result = catalog.GetTurbinesByHydraulicName ( hydraulic );
-
-    cout << result.dump ( ) << endl;
-    res.set_content ( result.dump ( ), "application/json" );
-}
-
 void HTTPServer::configurateRoutes()
 {    
     Get ( "/hydraulics", [this](const httplib::Request &req, httplib::Response &res) { return hydraulicsRoute ( req, res ); } );
-    Get ( R"(/turbines/((\w[-']?)+))", [this](const httplib::Request &req, httplib::Response &res) { return turbinesByCentralRoute ( req, res ); }  );
+    // Get ( R"(/turbines/((\w[-']?)+))", [this](const httplib::Request &req, httplib::Response &res) { return turbinesByCentralRoute ( req, res ); }  );
 }
 
 void HTTPServer::Run ( )

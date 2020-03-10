@@ -61,11 +61,10 @@ class Catalog : public JSONParsable
     virtual JSON toJSON ( ) const;
 
     /**
-     * Get all names of the hydraulics in a JSON array.
-     * @return A JSON array with all names
+     * Get all names of the hydraulics and their turbines in a JSON object.
+     * @return A JSON array with the names of the hydraulics and their turbines' names
      */
-    virtual JSON GetHydraulics ( ) const;
-
+    virtual JSON GetHydraulics ( );
     /**
      * Get the information of all turbins by an hydraulic name
      * @param hydraulicName The name of the hydrolic
