@@ -16,17 +16,17 @@ void testTCPModule() {
 
 void testHTTPServer() {
     HTTPServer httpServer;
-
-    TCPServer tcpServer = TCPServer::fromString ( "StreamID=2 group=Avignon.Group1 attribute=HauteurChute type=H address=134.213.23.12 port=8013 protocol=TCP_PUSH frequency=2" );
-
-    cout << tcpServer << endl;
     httpServer.Run ( );
 }
 
 int main(int argc, const char **argv)
 {   
+<<<<<<< HEAD
     testTCPModule();
     // testHTTPServer();
+=======
+    testHTTPServer();
+>>>>>>> d0300fc45b5224607fedcab0d42d9c5b70bc3b43
 
     return 0;
 }

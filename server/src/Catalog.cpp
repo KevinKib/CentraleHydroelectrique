@@ -32,8 +32,11 @@ void Catalog::parseCatalog ( string catalogContent )
         if ( count >= 2 )
         {
             // parse the current line
-            TCPServer tcpServer = TCPServer::fromString ( buffer );
-            serverList[tcpServer.central][tcpServer.attribute][tcpServer.turbine].emplace ( tcpServer.protocol, tcpServer );
+            if ( buffer.length ( ) > 1 )
+            {
+                TCPServer tcpServer = TCPServer::fromString ( buffer );
+                serverList[tcpServer.central][tcpServer.attribute][tcpServer.turbine].emplace ( tcpServer.protocol, tcpServer );
+            }
         }
 
         ++count;

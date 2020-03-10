@@ -49,22 +49,24 @@ TCPServer TCPServer::fromString ( string data )
     // group parsing
     index = data.find_first_of ( "=" ) + 1;
     data = data.substr ( index );
-
-    // exemple : Avignon.Groupe1
-    if ( data[0] != ' '  )
+    index = data.find_first_of ( " " );
+    buffer = data.substr ( 0, index );
+    data = data.substr ( index );
+    index = buffer.find_first_of ( "." );
+    
+    if (index == string::npos)
     {
-        index = data.find_first_of ( "." );
-        central = data.substr ( 0, index );
-        data = data.substr ( index + 1 );
-        index = data.find_first_of ( " " );
-        turbine = data.substr ( 0, index - 1);
-    } else 
-    {
-        data = data.substr ( 1 );
-        index = data.find_first_of ( " " );
-        central = data.substr ( 0, index  );
+        // format de la donnée : Avignon
+        central = buffer;
         turbine = "*";
     }
+    else
+    {
+        index = buffer.find_first_of ( "." );
+        central = buffer.substr ( 0, index );
+        turbine = buffer.substr ( index + 1 );
+    }
+
 
     // attribute
     index = data.find_first_of ( "=" ) + 1;
@@ -81,12 +83,14 @@ TCPServer TCPServer::fromString ( string data )
     type = data.substr ( 0, index );
     data = data.substr ( index );
 
+
     // adress parsing
     index = data.find_first_of ( "=" ) + 1;
     data = data.substr ( index );
     index = data.find_first_of ( " " );
     ip = data.substr ( 0, index );
     data = data.substr ( index );
+
 
     // port parsing
     index = data.find_first_of ( "=" ) + 1;
@@ -95,6 +99,7 @@ TCPServer TCPServer::fromString ( string data )
     buffer = data.substr ( 0, index );
     port = ( ushort ) stoul ( buffer, nullptr, 0 );
     data = data.substr ( index );
+
 
     // protocol parsing
     index = data.find_first_of ( "=" ) + 1;
