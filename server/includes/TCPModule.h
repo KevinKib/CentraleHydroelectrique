@@ -57,11 +57,11 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-    string makePullRequest(JSON params, const hc::Server & server);
+    TCPResponse makePullRequest(JSON params, const hc::Server & server);
     // Réalise une requête d'informations en temps réel
     // sur une centrale hydraulique.
 
-    bool makeHistoricRequest(JSON params, const hc::Server & server);
+    TCPResponse makeHistoricRequest(JSON params, const hc::Server & server);
     // Réalise une requête d'historique sur une centrale.
 
     /**

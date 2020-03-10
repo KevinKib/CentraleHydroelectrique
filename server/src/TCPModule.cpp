@@ -71,7 +71,7 @@ bool TCPModule::connectToServer(const hc::Server & server)
     } 
     
     // La connexion a réussi.
-    string key = server.GetKey ( );
+    string key = server.GetHashKey ( );
 
     sockets[key] = serv_socket;
 
@@ -110,12 +110,13 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
     return true;
 }
 
-bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
+TCPResponse TCPModule::makePullRequest(JSON params, const hc::Server & server)
 {
+    TCPResponse tcpResponse;
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS CRLF CRLF";
 
-    string key = server.GetKey ( );
+    string key = server.GetHashKey ( );
     int serv_socket = sockets[key];
 
     send(serv_socket, pullRequest, strlen(pullRequest), 0);
@@ -127,7 +128,9 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
         cout << "The server is not running." << endl;
-        return false;
+        tcpResponse.first = false;
+        tcpResponse.second = "The server is not running.";
+        return tcpResponse;
     }
 
     // Affichage de la réponse du serveur
@@ -139,10 +142,10 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
     // }
     cout << "Serveur : " << response << endl;
 
-    return true;
+    return tcpResponse;
 }
 
-bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
+TCPResponse TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
 {
     // TODO : Coder makeHistoricRequest
     // Envoi d'une requête TCP-PUSH au serveur
@@ -154,8 +157,9 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     //   END_DATE JJ/MM/YYYY HH:mm:ss CRLF
     //   CRLF
     // }   
+    TCPResponse tcpResponse;
 
-    string key = server.GetKey ( );
+    string key = server.GetHashKey ( );
 
     int serv_socket = sockets[key];
     char pushRequest[1024] = "GET ID CRLF LISTEN_PORT listen_port CRLF START_FATE JJ/MM/YYYY HH:mm:ss END_DATE JJ/MM/YYYY HH:mm:ss CRLF CRLF";
@@ -171,7 +175,9 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
         cout << "The server is not running." << endl;
-        return false;
+        tcpResponse.first = false;
+        tcpResponse.second = "The server is not running.";
+        return tcpResponse;
     }
 
     // Affichage de la réponse du serveur
@@ -183,7 +189,7 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     // }
     cout << "Serveur : " << response << endl;
 
-    return false;
+    return tcpResponse;
 }
 
 JSON TCPModule::parseResponse(string & data)

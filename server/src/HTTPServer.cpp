@@ -13,7 +13,7 @@ using namespace std;
 
 // ------ Static properties
 const string HTTPServer::CONFIG_FILENAME = "server.config.json";
-const ushort HTTPServer::SERVER_PORT = 8082;
+const ushort HTTPServer::SERVER_PORT = 8070;
 const string HTTPServer::SERVER_IP = "127.0.0.1";
 
 // ----- Constructors
@@ -97,8 +97,11 @@ void HTTPServer::configurateRoutes()
                     return;
                 }
 
-                result["content"] = "Success";
-                res.set_content ( result.dump( ), "application/json" );
+                if ( tcpServerResult.second )
+                {
+                    result["content"] = "Success";
+                    res.set_content ( result.dump( ), "application/json" );
+                }
         } 
     );
 }
