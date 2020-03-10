@@ -101,7 +101,7 @@ JSON Catalog::GetHydraulics ( ) const
     }
 
 
-    object["hydraulics"] = array;
+    object["data"] = array;
     return object;
 }
 
