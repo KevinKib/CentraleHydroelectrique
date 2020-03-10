@@ -11,6 +11,7 @@
 #define TCPMODULE_H
 //--------------------------------------------------- Interfaces utilisées
 #include <map>
+#include <string>
 
 #include "../libs/json/single_include/nlohmann/json.hpp"
 #include "Server.h"

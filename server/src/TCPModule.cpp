@@ -20,6 +20,7 @@ using namespace std;
 #include <netinet/in.h> 
 #include <sys/socket.h>
 #include <arpa/inet.h> 
+#include <errno.h>
 
 //------------------------------------------------------ Include personnel
 #include "../includes/TCPModule.h"
@@ -69,11 +70,13 @@ bool TCPModule::connectToServer(const hc::Server & server)
         cerr << "Connection failed." << endl;
         return false;
     } 
-    
-    // La connexion a réussi.
-    string key = server.GetKey ( );
 
-    sockets[key] = serv_socket;
+    // La connexion a réussi.
+    string key = server.GetKey();
+    
+    sockets[server.GetKey()] = serv_socket;
+
+    cout << "Key : " << key << endl;
 
     return true; 
 }
@@ -105,23 +108,29 @@ bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
-    string pullResponse = makePullRequest(params, server);
-    cout << pullResponse << endl;
+    // string pullResponse = makePullRequest(params, server);
+    // cout << pullResponse << endl;
 
     // makeHistoricRequest(params, server);
 
     return true;
 }
 
-bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
+string TCPModule::makePullRequest(JSON params, const hc::Server & server)
 {
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS CRLF CRLF";
+    string error = "An error occured.";
+    int serv_socket = sockets[server.GetKey()];
 
-    string key = server.GetKey ( );
-    int serv_socket = sockets[key];
+    cout << "Oui" << endl;
 
-    send(serv_socket, pullRequest, strlen(pullRequest), 0);
+    int send_value = send(serv_socket, pullRequest, strlen(pullRequest), 0);
+    // On vérifie que le message s'est bien envoyé.
+    if (send_value == -1) {
+        cout << "Send error. Errno = " << errno << "." << endl;
+        return error;
+    }
 
     // Attente de la réponse du serveur
     char response[1024] = {0};
@@ -130,7 +139,11 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
         cout << "The server is not running." << endl;
-        return false;
+        return error;
+    }
+    else if (read_value == -1) {
+        cout << "Read error. Errno = " << errno << "." << endl;
+        return error;
     }
 
     // Affichage de la réponse du serveur
@@ -140,9 +153,10 @@ bool TCPModule::makePullRequest(JSON params, const hc::Server & server)
     //   Value val CRLF
     //   CRLF
     // }
-    cout << "Serveur : " << response << endl;
+    string response_str = response;
+    cout << "Serveur : " << response_str << endl;
 
-    return true;
+    return response_str;
 }
 
 bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
@@ -162,6 +176,10 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     string start_date = "09/03/2020 08:00:00";
     string end_date = "10/03/2020 08:00:00";
     string id = "1";
+    
+
+    int serv_socket = sockets[server.GetKey()];
+
 
     string pushRequest = "GET " + id + " CRLF LISTEN_PORT " + listen_port + " CRLF START_DATE " + start_date + " CRLF END_DATE " + end_date + " CRLF CRLF";
     send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
@@ -170,9 +188,7 @@ bool TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
     string startRequest = "START CRLF CRLF";
     send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
 
-    // string key = server.GetKey ( );
-    // int serv_socket = sockets[key];
-
+    
     // On n'attend aucune réponse du serveur (?)
     // Le serveur se connecte sur le port du client
 
