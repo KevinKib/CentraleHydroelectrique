@@ -73,9 +73,7 @@ namespace hc
          **/
         inline string GetHashKey ( ) const
         {
-            string key = ip + ":";
-            key += port;
-            return key;
+            return ip + ":" + to_string(port);
         }
 
         // -------- Attributes
