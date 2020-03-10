@@ -72,7 +72,7 @@ protected:
 
 //----------------------------------------------------- Attributs protégés
 
-    unordered_map<hc::Server, int> map_server_socket;
+    // unordered_map<hc::Server, int> map_server_socket;
 
     int serv_socket;
     bool isConnected;

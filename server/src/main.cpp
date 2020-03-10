@@ -9,6 +9,7 @@ using namespace std;
 
 void testTCPModule() {
     hc::Server testServer("127.0.0.1", 8081);
+    hc::Server dorianServer("", 8081);
     TCPModule tcpModule;
     tcpModule.MakeRequest(nullptr, testServer);
 }
