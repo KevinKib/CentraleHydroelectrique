@@ -159,8 +159,10 @@ string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
     send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
     cout << "Push init message sent." << endl;
 
+    // On attend, pour s'assurer que les deux sockets ne sont envoyées en même temps.
     sleep(1);
 
+    // On envoie le message START.
     string startRequest = "START\r\n\r\n";
     send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
     cout << "Start message sent." << endl;

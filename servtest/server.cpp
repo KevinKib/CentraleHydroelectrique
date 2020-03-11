@@ -64,7 +64,6 @@ int main() {
 
     cout << "Test server started on port " << PORT << "." << endl;
 
-
     while(true) {
 
         new_socket = accept(server_fd, (struct sockaddr *)&addr, (socklen_t*)&addrlen);
