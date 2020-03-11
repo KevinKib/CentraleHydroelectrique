@@ -67,7 +67,6 @@ int main() {
 
     while(true) {
 
-        //
         new_socket = accept(server_fd, (struct sockaddr *)&addr, (socklen_t*)&addrlen);
         if (new_socket < 0) 
         { 
