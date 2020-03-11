@@ -12,6 +12,7 @@
 #include "Server.h"
 #include "Catalog.h"
 #include "TCPModule.h"
+#include "DataModule.h"
 
 #ifndef HTTP_SERVER_H
 #define HTTP_SERVER_H
@@ -49,6 +50,8 @@ class HTTPServer: public httplib::Server
     Catalog catalog;
 
     TCPModule tcp;
+
+    DataModule testData;
 
     // ----- Methods for the routes
 

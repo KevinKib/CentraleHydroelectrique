@@ -18,7 +18,7 @@ const string HTTPServer::SERVER_IP = "127.0.0.1";
 
 // ----- Constructors
 HTTPServer::HTTPServer()
-    : tcp ( )
+    : tcp ( ), testData ( )
 {
     // read the config file
     string data = FileReader::ReadFile ( HTTPServer::CONFIG_FILENAME );
@@ -103,6 +103,39 @@ void HTTPServer::configurateRoutes()
         res.set_content ( catalog.GetHydraulics ( ).dump ( ), "application/json" );
         res.set_header ( "Access-Control-Allow-Origin", "*" );
     } );
+
+    Get ( "/test-data", [&](const httplib::Request &req, httplib::Response &res)
+    {
+        JSON json;
+        auto beginIterator = req.params.find ( "begin" );
+        auto endIterator = req.params.find ( "end" );
+
+        if ( beginIterator == req.params.end ( )
+            || endIterator == req.params.end ( ) )
+        {
+            json["success"] = false;
+            json["error"] = "You have to send a begin and end params";
+            res.set_content( json.dump ( ), "application/json" );
+            return;
+        }
+
+        int begin = atoi ( beginIterator->second.c_str ( ) );
+        int end = atoi ( endIterator->second.c_str ( ) );
+
+        JSON data = testData.GetDataByRange ( begin, end );
+        if ( data.empty ( ) )
+        {
+            json["success"] = false;
+            json["error"] = "The range isn't correct";
+        } else
+        {
+            json["success"] = true;
+            json["data"] = data;
+        }
+
+        res.set_content ( json.dump ( ), "application/json" );
+        res.set_header ( "Access-Control-Allow-Origin", "*" );
+    });
 
     /**
      * Waiting params : {

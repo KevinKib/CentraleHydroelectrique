@@ -26,7 +26,7 @@ class JSONParsable
      * Method that parse an object in JSON
      * @return The representation in JSON of the current object
      **/
-    virtual JSON toJSON ( ) const = 0;
+    virtual JSON ToJSON ( int begin, int end ) const = 0;
 };
 
 #endif
