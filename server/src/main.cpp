@@ -7,16 +7,20 @@
 
 using namespace std;
 
-void testTCPModule() {
-    // hc::Server testServer("127.0.0.1", 8100);
-    hc::Server dorianServer("", 8080);
-    // hc::Server avignon("127.0.0.1", 8088);      // TCP-PUSH
-    hc::Server avignon("127.0.0.1", 11113);  // TCP-PULL
+bool testTCPModule() {
+    TCPServer avignon_pull("127.0.0.1", 11113, 1, "attribute", "type", 0.1, PULL, "centrale", "turbine");
+    TCPServer avignon_push("127.0.0.1", 8088,  1, "attribute", "type", 0.1, PUSH, "centrale", "turbine");
 
-    TCPServer avignon_tcp("127.0.0.1", 8088, 1, "attribute", "type", 0.1, PUSH, "centrale", "turbine");
-
-    TCPModule tcpModule;
-    tcpModule.MakeRequest(nullptr, avignon_tcp);
+    try {
+        TCPModule tcpModule;
+        tcpModule.MakeRequest(nullptr, avignon_push);
+    }
+    catch (const string & e) {
+        cerr << "Error : " << e << endl;
+        return false;
+    }
+    
+    return true;
 }
 
 void testHTTPServer() {
@@ -26,8 +30,8 @@ void testHTTPServer() {
 
 int main(int argc, const char **argv)
 {   
-    // testHTTPServer();
-    testTCPModule();
+    testHTTPServer();
+    // testTCPModule();
 
     return 0;
 }

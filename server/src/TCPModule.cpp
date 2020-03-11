@@ -36,16 +36,11 @@ using namespace std;
 
 bool TCPModule::isConnected(const TCPServer server)
 {
-    // unordered_map<string, int>::iterator it = sockets.find(server);
-    // return (it != map_server_socket.end());
-
-    cout << sockets[server.GetHashKey()] << endl;
-    return false;
+    return sockets[server.GetHashKey()] > 0;
 }
 
 bool TCPModule::connectToServer(const TCPServer & server)
 {
-    
     // https://www.geeksforgeeks.org/socket-programming-cc/
     cout << "Attempt to connect to the following server : " << endl << server << endl;
 
@@ -54,8 +49,7 @@ bool TCPModule::connectToServer(const TCPServer & server)
     // On crée un socket.
     int serv_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (serv_socket < 0) { 
-        cerr << "Socket creation error." << endl;
-        return false; 
+        throw string("Socket creation error.");
     } 
    
     serv_addr.sin_family = AF_INET; 
@@ -63,38 +57,37 @@ bool TCPModule::connectToServer(const TCPServer & server)
        
     if(inet_pton(AF_INET, server.ip.c_str(), &serv_addr.sin_addr)<=0)  
     { 
-        cerr << "Invalid address/ Address not supported" << endl;
-        return false;
+        throw string("Invalid address/ Address not supported");
     } 
 
     int connect_val = connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (connect_val < 0) 
     { 
-        cerr << "Connection failed." << endl;
-        return false;
+        throw string("Connection failed.");
     } 
 
     // La connexion a réussi.
     string key = server.GetHashKey ( );
     sockets[key] = serv_socket;
+    cout << "Successful connection." << endl;
 
     return true; 
 }
 
-// bool TCPModule::DisconnectFromServer(const hc::Server & server)
-// {
-//     // Envoie une requête de déconnexion au serveur.
-//     char disconnectRequest[1024] = "END CRLF CRLF";
-//     send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
-
-//     // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
-//     return true;
-// }
-
-TCPResponse TCPModule::MakeRequest(JSON params, const TCPServer & server)
+bool TCPModule::DisconnectFromServer(const TCPServer & server)
 {
-    TCPResponse tcpResponse;
-    tcpResponse.first = false;
+    int serv_socket = sockets[server.GetHashKey()];
+
+    // Envoie une requête de déconnexion au serveur.
+    char disconnectRequest[1024] = "END\r\n\r\n";
+    send(serv_socket, disconnectRequest, strlen(disconnectRequest), 0);
+
+    // N'attend aucune réponse du serveur; considère qu'il est déconnecté.
+    return true;
+}
+
+string TCPModule::MakeRequest(JSON params, const TCPServer & server)
+{
 
     // Si l'on est pas connecté, on fait un essai de connection.
     if (!isConnected(server)) {
@@ -102,44 +95,28 @@ TCPResponse TCPModule::MakeRequest(JSON params, const TCPServer & server)
     }
 
     // Si l'on est toujours pas connecté, alors on signale que la requête à échoué.
-    // if (!isConnected(server)) {
-    //     cout << "Could not connect." << endl;
-    //     tcpResponse.second = "Could not connect to server.";
-    //     return tcpResponse;
-    // }
+    if (!isConnected(server)) {
+        throw "Could not connect to server.";
+    }
 
-    // Test de requête
-    // TODO : Sélectionner la bonne requête en fonction des paramètres
-    
-
-    tcpResponse = ( server.protocol == TCPProtocol::PUSH ) 
+    string response = ( server.protocol == TCPProtocol::PUSH ) 
         ? makeHistoricRequest( params, server )
         : makePullRequest ( server );
 
-    // tcpResponse = makePullRequest(server);
-    // cout << "Serveur : " << tcpResponse.second << endl;
-    return tcpResponse;
+    return response;
 }
 
-TCPResponse TCPModule::makePullRequest(const TCPServer & server)
+string TCPModule::makePullRequest(const TCPServer & server)
 {
-    TCPResponse tcpResponse;
-    
     // Envoi d'une requête pull au serveur
-    char pullRequest[1024] = "GET TS CRLF CRLF";
-    string error = "An error occured.";
-    string key = server.GetHashKey ( );
-    int serv_socket = sockets[key];
+    char pullRequest[1024] = "GET TS \r\n\r\n";
+    int serv_socket = sockets[server.GetHashKey()];
 
     int send_value = send(serv_socket, pullRequest, strlen(pullRequest), 0);
+
     // On vérifie que le message s'est bien envoyé.
-
-
     if (send_value == -1) {
-        tcpResponse.first = false;
-        // string r = "Send error. Errno = " + errno + ".";
-        tcpResponse.second = "Send error.";
-        return tcpResponse;
+        throw string("Send error. Errno = " + to_string(errno) + ".");
     }
 
     // Attente de la réponse du serveur
@@ -148,91 +125,47 @@ TCPResponse TCPModule::makePullRequest(const TCPServer & server)
 
     // On vérifie que le serveur à bien répondu
     if (read_value == 0) {
-        tcpResponse.first = false;
-        tcpResponse.second = "The server is not running.";
-        return tcpResponse;
+        throw string("The server is not running.");
     }
     else if (read_value == -1) {
-        tcpResponse.first = false;
-        // tcpResponse.second = "Read error. Errno = " + errno + ".";
-        tcpResponse.second = "Read error.";
-        return tcpResponse;
-       
+        throw string("Read error. Errno = " + to_string(errno) + ".");
     }
 
-    // Affichage de la réponse du serveur
-    // Réponse attendue :
-    // {
-    //   Timestamp ts CRLF
-    //   Value val CRLF
-    //   CRLF
-    // }
-
-    tcpResponse.first = true;
-    tcpResponse.second = response;
-
-    return tcpResponse;
+    return response;
 }
 
-TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
+string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
+/*
+    Envoi d'une requête TCP-PUSH au serveur
+    Envoi attendu :
+    {
+      GET ID CRLF
+      LISTEN_PORT listen_port CRLF
+      START_DATE JJ/MM/YYYY HH:mm:ss CRLF
+      END_DATE JJ/MM/YYYY HH:mm:ss CRLF
+      CRLF
+    }
+*/
 {
-    // TODO : Coder makeHistoricRequest
-    // Envoi d'une requête TCP-PUSH au serveur
-    // Envoi attendu :
-    // {
-    //   GET ID CRLF
-    //   LISTEN_PORT listen_port CRLF
-    //   START_DATE JJ/MM/YYYY HH:mm:ss
-    //   END_DATE JJ/MM/YYYY HH:mm:ss CRLF
-    //   CRLF
-    // }   
-    TCPResponse tcpResponse;
-
-    string key = server.GetHashKey();
     string listen_port = "8090";
     string start_date = "09/03/2020 08:00:00";
     string end_date = "10/03/2020 08:00:00";
     string id = "1";
 
-    int serv_socket = sockets[key];
+    int serv_socket = sockets[server.GetHashKey()];
+    
+    // On envoie une requête pour demander au serveur de se connecter sur le port spécifié par le client.
+    string pushRequest = "GET " + id + "\r\nLISTEN_PORT " + listen_port + "\r\nSTART_DATE " + start_date + "\r\nEND_DATE " + end_date + "\r\n\r\n";
+    send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
+    cout << "Push init message sent." << endl;
 
-    string pushRequest = "GET " + id 
-    + "\r\nLISTEN_PORT " + listen_port
-    + "\r\nSTART_DATE " + start_date
-    + "\r\nEND_DATE " + end_date
-    + " \r\n\r\n";
-
-    if ( send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0) == -1)
-    {
-        cerr << "Error during the send" << endl;
-        tcpResponse.first = false;
-        return tcpResponse;
-    }
+    sleep(1);
 
     string startRequest = "START\r\n\r\n";
+    send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
+    cout << "Start message sent." << endl;
 
-    if ( send(serv_socket, startRequest.c_str(), startRequest.length(), 0) == -1)
-    {
-        cerr << "Error during sending of START command" << endl;
-        return tcpResponse;
-    }
-
-    // On n'attend aucune réponse du serveur (?)
-    // Le serveur se connecte sur le port du client
-
-    cout << "Waiting server response" << endl;
-
-    // Attente de la réponse du serveur
-
-    // Affichage de la réponse du serveur
-    // Réponse attendue :
-    // {
-    //   Timestamp ts CRLF
-    //   Value val CRLF
-    //   CRLF
-    // }
-
-    return tcpResponse;
+    return string("Historic request return");
 }
 
 JSON TCPModule::parseResponse(string & data)

@@ -58,9 +58,9 @@ class HTTPServer: public httplib::Server
     /**
      * Permit to retrieve data from the request's params
      * @param req The current request
-     * @return The TCPResponse corresponding
+     * @return The empty string if there is some errors, else the content
      **/
-    TCPResponse proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol ) const;
+    string proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol );
 
     /**
      * Method to configurate the routes for the server to retrieve data.

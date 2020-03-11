@@ -32,7 +32,7 @@ class TCPModule
 public:
 //----------------------------------------------------- Méthodes publiques
 
-    TCPResponse MakeRequest(JSON params, const TCPServer & server);
+    string MakeRequest(JSON params, const TCPServer & server);
     // Envoie une requête afin d'obtenir des informations
     // d'un serveur.
 
@@ -59,11 +59,11 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-    TCPResponse makePullRequest(const TCPServer & server);
+    string makePullRequest(const TCPServer & server);
     // Réalise une requête d'informations en temps réel
     // sur une centrale hydraulique.
 
-    TCPResponse makeHistoricRequest(JSON params, const TCPServer & server);
+    string makeHistoricRequest(JSON params, const TCPServer & server);
     // Réalise une requête d'historique sur une centrale.
 
     /**

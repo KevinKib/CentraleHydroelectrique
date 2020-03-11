@@ -51,9 +51,9 @@ HTTPServer::~HTTPServer()
 
 // ----- Methods
 
-TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol ) const
+string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol protocol )
 {
-    TCPResponse response;
+    string response = "";
     // retrieve the central, turbine, attribute and date
     auto centralIterator = req.params.find ( "hydraulic" );
     auto turbineIterator = req.params.find ( "turbine" );
@@ -66,8 +66,6 @@ TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPPro
         attributeIterator == req.params.end ( ) )
     {
         // error in the params of the request
-        response.second = "Error with the parameters of the request at the path " + req.path; 
-        response.first = false;
         return response;
     }
 
@@ -81,20 +79,22 @@ TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPPro
     pair<TCPServer, bool> tcpServerResult = catalog.GetTCPServer ( hydraulic, turbine, attribute, protocol );
     if ( ! tcpServerResult.second )
     {
-        response.second = "Error during the retrieving of the TCPServer with your params. Please verify your params";
-        response.first = false;
         return response;
     }
 
-    if ( protocol == TCPProtocol::PULL )
-    {
-        response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
-    }
+    // if ( protocol == TCPProtocol::PULL )
+    // {
+    //     response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
+    // } 
+    // else
+    // {
+    //     JSON params;
+    //     params["date"] = date;
+    //     response = tcp.MakeRequest ( params, tcpServerResult.first );
+    // }
 
-    // temporary
-    response.first = true;
-    response.second = "Success";
-
+    // // temporary
+    response = "Success";
     return response;
 }
 
@@ -113,9 +113,11 @@ void HTTPServer::configurateRoutes()
         JSON json;
         auto beginIterator = req.params.find ( "begin" );
         auto endIterator = req.params.find ( "end" );
+        auto attributeIterator = req.params.find ( "attribute" );
 
         if ( beginIterator == req.params.end ( )
-            || endIterator == req.params.end ( ) )
+            || endIterator == req.params.end ( )
+            || attributeIterator == req.params.end ( )  )
         {
             json["success"] = false;
             json["error"] = "You have to send a begin and end params";
@@ -125,8 +127,9 @@ void HTTPServer::configurateRoutes()
 
         int begin = atoi ( beginIterator->second.c_str ( ) );
         int end = atoi ( endIterator->second.c_str ( ) );
+        string attribute = attributeIterator->second;
 
-        JSON data = testData.GetDataByRange ( begin, end );
+        JSON data = testData.GetDataByRange ( begin, end, attribute );
         if ( data.empty ( ) )
         {
             json["success"] = false;
@@ -155,10 +158,19 @@ void HTTPServer::configurateRoutes()
         { 
             JSON result;
 
-            TCPResponse response = proceedDataRequest ( req, TCPProtocol::PUSH );
+            string response = proceedDataRequest ( req, TCPProtocol::PUSH );
 
-            result["success"] = response.first;
-            result["content"] = response.second;
+            if ( response.empty ( ) )
+            {
+                result["success"] = false;
+                result["content"] = "Error !";
+            } else
+            {
+                result["content"] = response;
+                result["success"] = true;
+            }
+            
+
             res.set_content ( result.dump ( ), "application/json" );
             res.set_header ( "Access-Control-Allow-Origin", "*" );
         }
@@ -169,10 +181,17 @@ void HTTPServer::configurateRoutes()
         {
             JSON result;
 
-            TCPResponse response = proceedDataRequest ( req, TCPProtocol::PULL );
+            string response = proceedDataRequest ( req, TCPProtocol::PULL );
 
-            result["success"] = response.first;
-            result["content"] = response.second;
+            if ( response.empty ( ) )
+            {
+                result["success"] = false;
+                result["content"] = "Error !";
+            } else
+            {
+                result["content"] = response;
+                result["success"] = true;
+            }
 
             res.set_content ( result.dump ( ), "application/json" );
             res.set_header ( "Access-Control-Allow-Origin", "*" );
