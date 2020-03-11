@@ -137,6 +137,8 @@ TCPResponse TCPModule::makePullRequest(const TCPServer & server)
 
     int send_value = send(serv_socket, pullRequest, strlen(pullRequest), 0);
     // On vérifie que le message s'est bien envoyé.
+
+
     if (send_value == -1) {
         tcpResponse.first = false;
         // string r = "Send error. Errno = " + errno + ".";
@@ -198,16 +200,18 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server
 
     int serv_socket = sockets[key];
 
-    string pushRequest_1 = "GET " + id + " \r\n LISTEN_PORT " + listen_port + " \r\n START_DATE " + start_date + " \r\n END_DATE " + end_date + " \r\n \r\n";
-    string pushRequest_2 = "GET " + id + " \n LISTEN_PORT " + listen_port + " \n START_DATE " + start_date + " \n END_DATE " + end_date + " \n \n";
-    string pushRequest_3 = "GET " + id + " \r LISTEN_PORT " + listen_port + " \r START_DATE " + start_date + " \r END_DATE " + end_date + " \r \r";
-    string pushRequest_4 = "GET " + id + " LISTEN_PORT " + listen_port + " START_DATE " + start_date + " END_DATE " + end_date + "\n";
-    string pushRequest_5 = "GET " + id + "\r\n LISTEN_PORT " + listen_port + "\r\n START_DATE " + start_date + "\r\n END_DATE " + end_date + "\r\n";
-    string pushRequest_6 = "GET " + id + " \r\nLISTEN_PORT " + listen_port + " \r\nSTART_DATE " + start_date + " \r\nEND_DATE " + end_date + " \r\n \r\n";
+    string pushRequest = "GET " + id 
+    + "\r\nLISTEN_PORT " + listen_port
+    + "\r\nSTART_DATE " + start_date
+    + "\r\nEND_DATE " + end_date
+    + " \r\n\r\n";
 
-    send(serv_socket, pushRequest_6.c_str(), pushRequest_6.length(), 0);
-    cout << "Push init message sent." << endl;
-    sleep(3);
+    if ( send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0) == -1)
+    {
+        cerr << "Error during the send" << endl;
+        tcpResponse.first = false;
+        return tcpResponse;
+    }
 
     // string startRequest = "START \n \n";
     string startRequest_1 = "START \r\n \r\n";
