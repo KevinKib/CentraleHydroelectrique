@@ -63,8 +63,7 @@ TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPPro
 
     if (centralIterator == req.params.end ( ) || 
         turbineIterator == req.params.end ( ) ||
-        attributeIterator == req.params.end ( ) ||
-        dateIterator == req.params.end (  ) )
+        attributeIterator == req.params.end ( ) )
     {
         // error in the params of the request
         response.second = "Error with the parameters of the request at the path " + req.path; 
@@ -85,6 +84,11 @@ TCPResponse HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPPro
         response.second = "Error during the retrieving of the TCPServer with your params. Please verify your params";
         response.first = false;
         return response;
+    }
+
+    if ( protocol == TCPProtocol::PULL )
+    {
+        response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
     }
 
     // temporary
@@ -160,7 +164,7 @@ void HTTPServer::configurateRoutes()
         }
     );
 
-    Get ( "current-data", 
+    Get ( "/current-data", 
         [&](const httplib::Request &req, httplib::Response &res)
         {
             JSON result;

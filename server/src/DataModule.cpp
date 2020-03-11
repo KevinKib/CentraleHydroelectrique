@@ -64,7 +64,7 @@ void DataModule::parseData ( string fileContent )
     }
 }
 
-JSON DataModule::GetDataByRange ( int begin, int end ) const
+JSON DataModule::GetDataByRange ( int begin, int end, string attribute ) const
 {
     JSON json, array;
 

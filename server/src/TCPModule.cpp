@@ -78,8 +78,6 @@ bool TCPModule::connectToServer(const TCPServer & server)
     string key = server.GetHashKey ( );
     sockets[key] = serv_socket;
 
-    cout << "Key : " << key << endl;
-
     return true; 
 }
 
@@ -109,8 +107,6 @@ TCPResponse TCPModule::MakeRequest(JSON params, const TCPServer & server)
     //     tcpResponse.second = "Could not connect to server.";
     //     return tcpResponse;
     // }
-
-    cout << "Connection (likely) succeeded." << endl;
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
@@ -193,7 +189,7 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server
     TCPResponse tcpResponse;
 
     string key = server.GetHashKey();
-    string listen_port = "8100";
+    string listen_port = "8090";
     string start_date = "09/03/2020 08:00:00";
     string end_date = "10/03/2020 08:00:00";
     string id = "1";
@@ -213,33 +209,20 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server
         return tcpResponse;
     }
 
-    // string startRequest = "START \n \n";
-    string startRequest_1 = "START \r\n \r\n";
-    string startRequest_2 = "START \r\n";
-    string startRequest_3 = "START \n \n";
-    string startRequest_4 = "START \n";
-    string startRequest_5 = "START";
+    string startRequest = "START\r\n\r\n";
 
-    string startRequest = startRequest_5;
+    if ( send(serv_socket, startRequest.c_str(), startRequest.length(), 0) == -1)
+    {
+        cerr << "Error during sending of START command" << endl;
+        return tcpResponse;
+    }
 
-    send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
-    cout << "Start message sent." << endl;
-
-    
     // On n'attend aucune réponse du serveur (?)
     // Le serveur se connecte sur le port du client
 
-    // Attente de la réponse du serveur
-    char response[1024] = {0};
-    int read_value = read(serv_socket, response, 1024);
+    cout << "Waiting server response" << endl;
 
-    // On vérifie que le serveur à bien répondu
-    if (read_value == 0) {
-        cout << "The server is not running." << endl;
-        tcpResponse.first = false;
-        tcpResponse.second = "The server is not running.";
-        return tcpResponse;
-    }
+    // Attente de la réponse du serveur
 
     // Affichage de la réponse du serveur
     // Réponse attendue :
@@ -248,7 +231,6 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server
     //   Value val CRLF
     //   CRLF
     // }
-    cout << "Serveur : " << response << endl;
 
     return tcpResponse;
 }

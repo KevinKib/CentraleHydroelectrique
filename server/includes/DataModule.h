@@ -32,7 +32,7 @@ class DataModule
      * @param end The end of the range
      * @return The JSON data according to the range
      **/
-    JSON GetDataByRange ( int begin, int end ) const;
+    JSON GetDataByRange ( int begin, int end, string attribute ) const;
 
     private:
     // ----- Methods
