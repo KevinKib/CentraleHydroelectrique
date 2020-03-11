@@ -116,7 +116,9 @@ TCPResponse TCPModule::MakeRequest(JSON params, const TCPServer & server)
     // TODO : Sélectionner la bonne requête en fonction des paramètres
     
 
-    makeHistoricRequest(params, server);
+    tcpResponse = ( server.protocol == TCPProtocol::PUSH ) 
+        ? makeHistoricRequest( params, server )
+        : makePullRequest ( server );
 
     // tcpResponse = makePullRequest(server);
     // cout << "Serveur : " << tcpResponse.second << endl;
