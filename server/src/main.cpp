@@ -12,8 +12,11 @@ void testTCPModule() {
     hc::Server dorianServer("", 8080);
     // hc::Server avignon("127.0.0.1", 8088);      // TCP-PUSH
     hc::Server avignon("127.0.0.1", 11113);  // TCP-PULL
+
+    TCPServer avignon_tcp("127.0.0.1", 8088, 1, "attribute", "type", 0.1, PUSH, "centrale", "turbine");
+
     TCPModule tcpModule;
-    tcpModule.MakeRequest(nullptr, avignon);
+    tcpModule.MakeRequest(nullptr, avignon_tcp);
 }
 
 void testHTTPServer() {
@@ -23,8 +26,8 @@ void testHTTPServer() {
 
 int main(int argc, const char **argv)
 {   
-    testHTTPServer();
-    // testTCPModule();
+    // testHTTPServer();
+    testTCPModule();
 
     return 0;
 }

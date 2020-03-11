@@ -62,7 +62,7 @@ int main() {
         exit(1);
     } 
 
-    cout << "Test server started." << endl;
+    cout << "Test server started on port " << PORT << "." << endl;
 
 
     while(true) {
@@ -79,9 +79,9 @@ int main() {
         valread = read(new_socket, buffer, 1024); 
         cout << "Client : " << buffer << endl; 
 
-        // Répond au client.
-        send(new_socket, hello, strlen(hello), 0); 
-        cout << "Hello message sent." << endl;
+        // // Répond au client.
+        // send(new_socket, hello, strlen(hello), 0); 
+        // cout << "Hello message sent." << endl;
     }
      
     return 0;

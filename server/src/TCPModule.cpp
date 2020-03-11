@@ -24,6 +24,7 @@ using namespace std;
 
 //------------------------------------------------------ Include personnel
 #include "../includes/TCPModule.h"
+#include "../includes/TCPServer.h"
 
 //------------------------------------------------------------- Constantes
 
@@ -33,14 +34,16 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 
-// bool TCPModule::isConnected(const hc::Server server)
-// {
-//     unordered_map<hc::Server, int>::iterator it = map_server_socket.find(server);
+bool TCPModule::isConnected(const TCPServer server)
+{
+    // unordered_map<string, int>::iterator it = sockets.find(server);
+    // return (it != map_server_socket.end());
 
-//     return (it != map_server_socket.end());
-// }
+    cout << sockets[server.GetHashKey()] << endl;
+    return false;
+}
 
-bool TCPModule::connectToServer(const hc::Server & server)
+bool TCPModule::connectToServer(const TCPServer & server)
 {
     
     // https://www.geeksforgeeks.org/socket-programming-cc/
@@ -90,34 +93,40 @@ bool TCPModule::connectToServer(const hc::Server & server)
 //     return true;
 // }
 
-bool TCPModule::MakeRequest(JSON params, const hc::Server & server)
+TCPResponse TCPModule::MakeRequest(JSON params, const TCPServer & server)
 {
+    TCPResponse tcpResponse;
+    tcpResponse.first = false;
+
     // Si l'on est pas connecté, on fait un essai de connection.
-    if (!isConnected) {
-        isConnected = connectToServer(server);
+    if (!isConnected(server)) {
+        connectToServer(server);
     }
 
     // Si l'on est toujours pas connecté, alors on signale que la requête à échoué.
-    if (!isConnected) {
-        cerr << "Could not connect to server." << endl;
-        return false;
-    }
+    // if (!isConnected(server)) {
+    //     cout << "Could not connect." << endl;
+    //     tcpResponse.second = "Could not connect to server.";
+    //     return tcpResponse;
+    // }
 
-    cout << "Connection succeeded." << endl;
+    cout << "Connection (likely) succeeded." << endl;
 
     // Test de requête
     // TODO : Sélectionner la bonne requête en fonction des paramètres
-    TCPResponse r = makePullRequest(params, server);
-    cout << "Serveur : " << r.second << endl;
+    
 
-    // makeHistoricRequest(params, server);
+    makeHistoricRequest(params, server);
 
-    return true;
+    // tcpResponse = makePullRequest(server);
+    // cout << "Serveur : " << tcpResponse.second << endl;
+    return tcpResponse;
 }
 
-TCPResponse TCPModule::makePullRequest(JSON params, const hc::Server & server)
+TCPResponse TCPModule::makePullRequest(const TCPServer & server)
 {
     TCPResponse tcpResponse;
+    
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS CRLF CRLF";
     string error = "An error occured.";
@@ -129,7 +138,7 @@ TCPResponse TCPModule::makePullRequest(JSON params, const hc::Server & server)
     if (send_value == -1) {
         tcpResponse.first = false;
         // string r = "Send error. Errno = " + errno + ".";
-        tcpResponse.second = "Send error.";;
+        tcpResponse.second = "Send error.";
         return tcpResponse;
     }
 
@@ -165,7 +174,7 @@ TCPResponse TCPModule::makePullRequest(JSON params, const hc::Server & server)
     return tcpResponse;
 }
 
-TCPResponse TCPModule::makeHistoricRequest(JSON params, const hc::Server & server)
+TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
 {
     // TODO : Coder makeHistoricRequest
     // Envoi d'une requête TCP-PUSH au serveur
@@ -187,12 +196,28 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const hc::Server & serve
 
     int serv_socket = sockets[key];
 
-    string pushRequest = "GET " + id + " CRLF LISTEN_PORT " + listen_port + " CRLF START_DATE " + start_date + " CRLF END_DATE " + end_date + " CRLF CRLF";
-    send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
+    string pushRequest_1 = "GET " + id + " \r\n LISTEN_PORT " + listen_port + " \r\n START_DATE " + start_date + " \r\n END_DATE " + end_date + " \r\n \r\n";
+    string pushRequest_2 = "GET " + id + " \n LISTEN_PORT " + listen_port + " \n START_DATE " + start_date + " \n END_DATE " + end_date + " \n \n";
+    string pushRequest_3 = "GET " + id + " \r LISTEN_PORT " + listen_port + " \r START_DATE " + start_date + " \r END_DATE " + end_date + " \r \r";
+    string pushRequest_4 = "GET " + id + " LISTEN_PORT " + listen_port + " START_DATE " + start_date + " END_DATE " + end_date + "\n";
+    string pushRequest_5 = "GET " + id + "\r\n LISTEN_PORT " + listen_port + "\r\n START_DATE " + start_date + "\r\n END_DATE " + end_date + "\r\n";
+    string pushRequest_6 = "GET " + id + " \r\nLISTEN_PORT " + listen_port + " \r\nSTART_DATE " + start_date + " \r\nEND_DATE " + end_date + " \r\n \r\n";
+
+    send(serv_socket, pushRequest_6.c_str(), pushRequest_6.length(), 0);
     cout << "Push init message sent." << endl;
-    sleep(1);
-    string startRequest = "START CRLF CRLF";
+    sleep(3);
+
+    // string startRequest = "START \n \n";
+    string startRequest_1 = "START \r\n \r\n";
+    string startRequest_2 = "START \r\n";
+    string startRequest_3 = "START \n \n";
+    string startRequest_4 = "START \n";
+    string startRequest_5 = "START";
+
+    string startRequest = startRequest_5;
+
     send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
+    cout << "Start message sent." << endl;
 
     
     // On n'attend aucune réponse du serveur (?)
