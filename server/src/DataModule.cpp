@@ -66,7 +66,7 @@ void DataModule::parseData ( string fileContent )
 
 JSON DataModule::GetDataByRange ( int begin, int end, string attribute ) const
 {
-    JSON json, array;
+    JSON json;
 
     // error in the range
     if ( begin < 0 || begin > end )
@@ -74,18 +74,18 @@ JSON DataModule::GetDataByRange ( int begin, int end, string attribute ) const
         return json;
     }
 
-    for ( pair<string, JSON> rawData : data )
+    // find the map according to the attribute
+    if ( data.find ( attribute ) == data.end ( ) )
     {
-        array = JSON::array ( );
-        JSON currentFieldData = rawData.second;
+        // attribute not found
+        return json;
+    }
 
-        // recover the data from current json object
-        for ( int i = begin; i < end; ++i )
-        {
-            array.push_back ( currentFieldData[i] );
-        }
+    JSON result = data.at ( attribute );
 
-        json[rawData.first] = array;
+    for ( int i = begin; i < end; ++i )
+    {
+        json.push_back ( result[i] );
     }
 
     return json;

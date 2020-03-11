@@ -120,7 +120,7 @@ void HTTPServer::configurateRoutes()
             || attributeIterator == req.params.end ( )  )
         {
             json["success"] = false;
-            json["error"] = "You have to send a begin and end params";
+            json["error"] = "You have to send a begin, end and attribute params";
             res.set_content( json.dump ( ), "application/json" );
             return;
         }
