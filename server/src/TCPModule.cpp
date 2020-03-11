@@ -189,34 +189,25 @@ TCPResponse TCPModule::makeHistoricRequest(JSON params, const TCPServer & server
     TCPResponse tcpResponse;
 
     string key = server.GetHashKey();
-    string listen_port = "8100";
+    string listen_port = "8090";
     string start_date = "09/03/2020 08:00:00";
     string end_date = "10/03/2020 08:00:00";
     string id = "1";
 
     int serv_socket = sockets[key];
 
-    string pushRequest_1 = "GET " + id + " \r\n LISTEN_PORT " + listen_port + " \r\n START_DATE " + start_date + " \r\n END_DATE " + end_date + " \r\n \r\n";
-    string pushRequest_2 = "GET " + id + " \n LISTEN_PORT " + listen_port + " \n START_DATE " + start_date + " \n END_DATE " + end_date + " \n \n";
-    string pushRequest_3 = "GET " + id + " \r LISTEN_PORT " + listen_port + " \r START_DATE " + start_date + " \r END_DATE " + end_date + " \r \r";
-    string pushRequest_4 = "GET " + id + " LISTEN_PORT " + listen_port + " START_DATE " + start_date + " END_DATE " + end_date + "\n";
-    string pushRequest_5 = "GET " + id + "\r\n LISTEN_PORT " + listen_port + "\r\n START_DATE " + start_date + "\r\n END_DATE " + end_date + "\r\n";
-    string pushRequest_6 = "GET " + id + " \r\nLISTEN_PORT " + listen_port + " \r\nSTART_DATE " + start_date + " \r\nEND_DATE " + end_date + " \r\n \r\n";
 
-    send(serv_socket, pushRequest_6.c_str(), pushRequest_6.length(), 0);
+    string pushRequest = "GET " + id + "\r\nLISTEN_PORT " + listen_port + "\r\nSTART_DATE " + start_date + "\r\nEND_DATE " + end_date + "\r\n\r\n";
+
+    send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
     cout << "Push init message sent." << endl;
     sleep(3);
 
-    // string startRequest = "START \n \n";
-    string startRequest_1 = "START \r\n \r\n";
-    string startRequest_2 = "START \r\n";
-    string startRequest_3 = "START \n \n";
-    string startRequest_4 = "START \n";
-    string startRequest_5 = "START";
-
-    string startRequest = startRequest_5;
+    string startRequest = "START\r\n\r\n";
 
     send(serv_socket, startRequest.c_str(), startRequest.length(), 0);
+
+
     cout << "Start message sent." << endl;
 
     
