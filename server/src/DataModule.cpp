@@ -81,11 +81,14 @@ JSON DataModule::GetDataByRange ( int begin, int end, string attribute ) const
         return json;
     }
 
+    JSON timestamps = data.at ( "Timestamp" );
+
     JSON result = data.at ( attribute );
 
     for ( int i = begin; i < end; ++i )
     {
-        json.push_back ( result[i] );
+        string timestamp = to_string ( timestamps[i] );
+        json[timestamp] = result[i];
     }
 
     return json;
