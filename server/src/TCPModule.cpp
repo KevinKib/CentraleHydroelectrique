@@ -96,18 +96,25 @@ string TCPModule::MakeRequest(JSON params, const TCPServer & server)
 
     // Si l'on est toujours pas connecté, alors on signale que la requête à échoué.
     if (!isConnected(server)) {
-        throw "Could not connect to server.";
+        throw string("Could not connect to server.");
     }
 
-    string response = ( server.protocol == TCPProtocol::PUSH ) 
-        ? makeHistoricRequest( params, server )
-        : makePullRequest ( server );
+    string response = "";
+
+    if (server.protocol == TCPProtocol::PULL) {
+        response = makePullRequest ( server );
+    }
+    else {
+        throw string("TCP-PUSH protocol is unimplemented.");
+    }
 
     return response;
 }
 
 string TCPModule::makePullRequest(const TCPServer & server)
 {
+    cout << "Do we enter" << endl;
+
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS \r\n\r\n";
     int serv_socket = sockets[server.GetHashKey()];
@@ -131,11 +138,17 @@ string TCPModule::makePullRequest(const TCPServer & server)
         throw string("Read error. Errno = " + to_string(errno) + ".");
     }
 
+    cout << response << endl;
+    string response_str = response;
+    JSON json = parseResponse(response_str);
+
     return response;
 }
 
 string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
 /*
+    Le protocole TCP-PUSH n'est désormais plus utilisé.
+
     Envoi d'une requête TCP-PUSH au serveur
     Envoi attendu :
     {
@@ -173,7 +186,48 @@ string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
 JSON TCPModule::parseResponse(string & data)
 {
     // TODO : Coder parseResponse
-    return nullptr;
+    JSON json;
+    string buffer;
+    int index;
+
+    // json["time"] = data.substr(0, data.length()-4);
+
+    index = data.find_first_of ( "/" );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["day"] = buffer;
+
+    index = data.find_first_of ( "/" );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["month"] = buffer;
+
+    index = data.find_first_of ( " " );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["year"] = buffer;
+
+    index = data.find_first_of ( ":" );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["hour"] = buffer;
+
+    index = data.find_first_of ( ":" );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["minute"] = buffer;
+
+    index = data.find_first_of ( " " );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["second"] = buffer;
+
+    index = data.find_first_of ( "\r" );
+    buffer = data.substr(0, index);
+    data = data.substr ( index+1 );
+    json["value"] = buffer;
+
+    return json;
 }
 
 //------------------------------------------------- Surcharge d'opérateurs
