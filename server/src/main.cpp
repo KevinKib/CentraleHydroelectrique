@@ -19,7 +19,7 @@ bool testTCPModule() {
         cerr << "Error : " << e << endl;
         return false;
     }
-    
+
     return true;
 }
 
@@ -29,9 +29,9 @@ void testHTTPServer() {
 }
 
 int main(int argc, const char **argv)
-{   
-    // testHTTPServer();
-    testTCPModule();
+{
+    testHTTPServer();
+    // testTCPModule();
 
     return 0;
 }
