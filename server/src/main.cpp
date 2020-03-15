@@ -13,7 +13,7 @@ bool testTCPModule() {
 
     try {
         TCPModule tcpModule;
-        tcpModule.MakeRequest(nullptr, avignon_pull);
+        JSON json = tcpModule.MakeRequest(nullptr, avignon_pull);
     }
     catch (const string & e) {
         cerr << "Error : " << e << endl;
@@ -29,7 +29,7 @@ void testHTTPServer() {
 }
 
 int main(int argc, const char **argv)
-{
+{   
     testHTTPServer();
     // testTCPModule();
 

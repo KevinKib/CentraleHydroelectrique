@@ -68,9 +68,9 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
-    string hydraulic = centralIterator->first;
-    string turbine = turbineIterator->first;
-    string attribute = attributeIterator->first;
+    string hydraulic = centralIterator->second;
+    string turbine = turbineIterator->second;
+    string attribute = attributeIterator->second;
 
 
     // retrieve the server with the given parameters
@@ -80,8 +80,18 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
+    if ( protocol == TCPProtocol::PULL )
+    {
+        JSON json = tcp.MakeRequest ( nullptr, tcpServerResult.first );
+        response = to_string(json);
+    } 
+    else
+    {
+        throw string("TCP-PUSH Protocol is not implemented;");
+    }
+
     // // temporary
-    response = "Success";
+    // response = "Success";
     return response;
 }
 
@@ -167,7 +177,6 @@ void HTTPServer::configurateRoutes()
         [&](const httplib::Request &req, httplib::Response &res)
         {
             JSON result;
-
             string response = proceedDataRequest ( req, TCPProtocol::PULL );
 
             if ( response.empty ( ) )
@@ -189,6 +198,5 @@ void HTTPServer::configurateRoutes()
 void HTTPServer::Run ( )
 {
     cout << "Server running with " << HTTPServer::SERVER_IP << ":" << HTTPServer::SERVER_PORT << endl;
-
     listen ( HTTPServer::SERVER_IP.c_str(), HTTPServer::SERVER_PORT );
 }

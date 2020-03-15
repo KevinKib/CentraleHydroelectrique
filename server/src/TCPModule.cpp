@@ -17,6 +17,8 @@ using namespace std;
 #include <stdlib.h> 
 #include <string.h> 
 
+#include <iomanip>
+
 #include <netinet/in.h> 
 #include <sys/socket.h>
 #include <arpa/inet.h> 
@@ -86,9 +88,8 @@ bool TCPModule::DisconnectFromServer(const TCPServer & server)
     return true;
 }
 
-string TCPModule::MakeRequest(JSON params, const TCPServer & server)
+JSON TCPModule::MakeRequest(JSON params, const TCPServer & server)
 {
-
     // Si l'on est pas connecté, on fait un essai de connection.
     if (!isConnected(server)) {
         connectToServer(server);
@@ -99,7 +100,7 @@ string TCPModule::MakeRequest(JSON params, const TCPServer & server)
         throw string("Could not connect to server.");
     }
 
-    string response = "";
+    JSON response;
 
     if (server.protocol == TCPProtocol::PULL) {
         response = makePullRequest ( server );
@@ -111,10 +112,8 @@ string TCPModule::MakeRequest(JSON params, const TCPServer & server)
     return response;
 }
 
-string TCPModule::makePullRequest(const TCPServer & server)
+JSON TCPModule::makePullRequest(const TCPServer & server)
 {
-    cout << "Do we enter" << endl;
-
     // Envoi d'une requête pull au serveur
     char pullRequest[1024] = "GET TS \r\n\r\n";
     int serv_socket = sockets[server.GetHashKey()];
@@ -137,12 +136,10 @@ string TCPModule::makePullRequest(const TCPServer & server)
     else if (read_value == -1) {
         throw string("Read error. Errno = " + to_string(errno) + ".");
     }
-
-    cout << response << endl;
+    
     string response_str = response;
-    JSON json = parseResponse(response_str);
 
-    return response;
+    return parseResponse(response_str);
 }
 
 string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
@@ -185,12 +182,10 @@ string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
 
 JSON TCPModule::parseResponse(string & data)
 {
-    // TODO : Coder parseResponse
     JSON json;
     string buffer;
     int index;
-
-    // json["time"] = data.substr(0, data.length()-4);
+    string datacpy = data;
 
     index = data.find_first_of ( "/" );
     buffer = data.substr(0, index);
@@ -210,22 +205,24 @@ JSON TCPModule::parseResponse(string & data)
     index = data.find_first_of ( ":" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
-    json["hour"] = buffer;
+    json["hours"] = buffer;
 
     index = data.find_first_of ( ":" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
-    json["minute"] = buffer;
+    json["minutes"] = buffer;
 
     index = data.find_first_of ( " " );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
-    json["second"] = buffer;
+    json["seconds"] = buffer;
 
     index = data.find_first_of ( "\r" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["value"] = buffer;
+
+    // json["timestamp"] = get_time()
 
     return json;
 }
