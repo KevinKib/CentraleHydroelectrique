@@ -39,7 +39,8 @@ HTTPServer::HTTPServer()
 
     if (!get)
     {
-        throw runtime_error("Error during the retrieving of catalog");
+        cerr << "Error during te retrieving of catalog from the HTTP server. Please be sure that the HTTP server with the catalog is opened." << endl;
+        exit(1);
     }
 
     string catalogContent = get->body;
@@ -81,17 +82,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     {
         return response;
     }
-
-    // if ( protocol == TCPProtocol::PULL )
-    // {
-    //     response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
-    // } 
-    // else
-    // {
-    //     JSON params;
-    //     params["date"] = date;
-    //     response = tcp.MakeRequest ( params, tcpServerResult.first );
-    // }
 
     // // temporary
     response = "Success";
