@@ -59,8 +59,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     auto centralIterator = req.params.find ( "hydraulic" );
     auto turbineIterator = req.params.find ( "turbine" );
     auto attributeIterator = req.params.find ( "attribute" );
-    auto dateIterator = req.params.find ( "date" );
-
 
     if (centralIterator == req.params.end ( ) || 
         turbineIterator == req.params.end ( ) ||
@@ -70,10 +68,9 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
-    string hydraulic = centralIterator->second;
-    string turbine = turbineIterator->second;
-    string attribute = attributeIterator->second;
-    string date = dateIterator->second;
+    string hydraulic = centralIterator->first;
+    string turbine = turbineIterator->first;
+    string attribute = attributeIterator->first;
 
 
     // retrieve the server with the given parameters
