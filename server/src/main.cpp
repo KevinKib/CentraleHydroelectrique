@@ -13,13 +13,13 @@ bool testTCPModule() {
 
     try {
         TCPModule tcpModule;
-        tcpModule.MakeRequest(nullptr, avignon_push);
+        tcpModule.MakeRequest(nullptr, avignon_pull);
     }
     catch (const string & e) {
         cerr << "Error : " << e << endl;
         return false;
     }
-    
+
     return true;
 }
 
@@ -29,7 +29,7 @@ void testHTTPServer() {
 }
 
 int main(int argc, const char **argv)
-{   
+{
     testHTTPServer();
     // testTCPModule();
 
