@@ -39,7 +39,8 @@ HTTPServer::HTTPServer()
 
     if (!get)
     {
-        throw runtime_error("Error during the retrieving of catalog");
+        cerr << "Error during te retrieving of catalog from the HTTP server. Please be sure that the HTTP server with the catalog is opened." << endl;
+        exit(1);
     }
 
     string catalogContent = get->body;
@@ -82,6 +83,7 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
+<<<<<<< HEAD
     if ( protocol == TCPProtocol::PULL )
     {
         JSON json = tcp.MakeRequest ( nullptr, tcpServerResult.first );
@@ -92,6 +94,8 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         throw string("TCP-PUSH Protocol is not implemented;");
     }
 
+=======
+>>>>>>> ab7db5478dd06fee0c0a8d93401a2ff8e2d94823
     // // temporary
     // response = "Success";
     return response;

@@ -19,7 +19,7 @@ bool testTCPModule() {
         cerr << "Error : " << e << endl;
         return false;
     }
-    
+
     return true;
 }
 
