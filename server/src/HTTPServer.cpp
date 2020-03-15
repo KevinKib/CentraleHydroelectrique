@@ -82,19 +82,18 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
-    // if ( protocol == TCPProtocol::PULL )
-    // {
-    //     response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
-    // } 
-    // else
-    // {
-    //     JSON params;
-    //     params["date"] = date;
-    //     response = tcp.MakeRequest ( params, tcpServerResult.first );
-    // }
+    if ( protocol == TCPProtocol::PULL )
+    {
+        JSON json = tcp.MakeRequest ( nullptr, tcpServerResult.first );
+        response = to_string(json);
+    } 
+    else
+    {
+        throw string("TCP-PUSH Protocol is not implemented;");
+    }
 
     // // temporary
-    response = "Success";
+    // response = "Success";
     return response;
 }
 
@@ -179,6 +178,7 @@ void HTTPServer::configurateRoutes()
     Get ( "/current-data", 
         [&](const httplib::Request &req, httplib::Response &res)
         {
+            cout << "eeeee COUCOU LA ZONE" << endl;
             JSON result;
 
             string response = proceedDataRequest ( req, TCPProtocol::PULL );
@@ -202,6 +202,5 @@ void HTTPServer::configurateRoutes()
 void HTTPServer::Run ( )
 {
     cout << "Server running with " << HTTPServer::SERVER_IP << ":" << HTTPServer::SERVER_PORT << endl;
-
     listen ( HTTPServer::SERVER_IP.c_str(), HTTPServer::SERVER_PORT );
 }
