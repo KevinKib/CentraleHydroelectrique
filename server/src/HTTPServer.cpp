@@ -59,7 +59,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     auto centralIterator = req.params.find ( "hydraulic" );
     auto turbineIterator = req.params.find ( "turbine" );
     auto attributeIterator = req.params.find ( "attribute" );
-    auto dateIterator = req.params.find ( "date" );
 
 
     if (centralIterator == req.params.end ( ) || 
@@ -73,7 +72,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     string hydraulic = centralIterator->second;
     string turbine = turbineIterator->second;
     string attribute = attributeIterator->second;
-    string date = dateIterator->second;
 
 
     // retrieve the server with the given parameters
@@ -83,7 +81,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
-<<<<<<< HEAD
     if ( protocol == TCPProtocol::PULL )
     {
         JSON json = tcp.MakeRequest ( nullptr, tcpServerResult.first );
@@ -94,8 +91,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         throw string("TCP-PUSH Protocol is not implemented;");
     }
 
-=======
->>>>>>> ab7db5478dd06fee0c0a8d93401a2ff8e2d94823
     // // temporary
     // response = "Success";
     return response;
@@ -182,9 +177,7 @@ void HTTPServer::configurateRoutes()
     Get ( "/current-data", 
         [&](const httplib::Request &req, httplib::Response &res)
         {
-            cout << "eeeee COUCOU LA ZONE" << endl;
             JSON result;
-
             string response = proceedDataRequest ( req, TCPProtocol::PULL );
 
             if ( response.empty ( ) )
