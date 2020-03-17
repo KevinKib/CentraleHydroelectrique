@@ -24,7 +24,7 @@ HTTPServer::HTTPServer()
     string data = FileReader::ReadFile ( HTTPServer::CONFIG_FILENAME );
     if ( data.empty ( ) )
     {
-        throw runtime_error("Error during the reading of the config file " + HTTPServer::CONFIG_FILENAME);
+        throw string ( "Error during the reading of the config file " + HTTPServer::CONFIG_FILENAME );
     }
 
     JSON config = JSON::parse(data);
