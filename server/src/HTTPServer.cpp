@@ -185,7 +185,8 @@ void HTTPServer::configurateRoutes()
                 result["content"] = "Error !";
             } else
             {
-                result["content"] = response;
+                JSON json = JSON::parse(response);
+                result["content"] = json;
                 result["success"] = true;
             }
 
