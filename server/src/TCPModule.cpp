@@ -13,15 +13,15 @@
 using namespace std;
 #include <iostream>
 #include <unistd.h>
-#include <stdio.h>  
-#include <stdlib.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <iomanip>
 
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #include <sys/socket.h>
-#include <arpa/inet.h> 
+#include <arpa/inet.h>
 #include <errno.h>
 
 //------------------------------------------------------ Include personnel
@@ -46,34 +46,34 @@ bool TCPModule::connectToServer(const TCPServer & server)
     // https://www.geeksforgeeks.org/socket-programming-cc/
     cout << "Attempt to connect to the following server : " << endl << server << endl;
 
-    struct sockaddr_in serv_addr; 
+    struct sockaddr_in serv_addr;
 
     // On crée un socket.
     int serv_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serv_socket < 0) { 
+    if (serv_socket < 0) {
         throw string("Socket creation error.");
-    } 
-   
-    serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(server.port); 
-       
-    if(inet_pton(AF_INET, server.ip.c_str(), &serv_addr.sin_addr)<=0)  
-    { 
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(server.port);
+
+    if(inet_pton(AF_INET, server.ip.c_str(), &serv_addr.sin_addr)<=0)
+    {
         throw string("Invalid address/ Address not supported");
-    } 
+    }
 
     int connect_val = connect(serv_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-    if (connect_val < 0) 
-    { 
+    if (connect_val < 0)
+    {
         throw string("Connection failed.");
-    } 
+    }
 
     // La connexion a réussi.
     string key = server.GetHashKey ( );
     sockets[key] = serv_socket;
     cout << "Successful connection." << endl;
 
-    return true; 
+    return true;
 }
 
 bool TCPModule::DisconnectFromServer(const TCPServer & server)
@@ -136,7 +136,7 @@ JSON TCPModule::makePullRequest(const TCPServer & server)
     else if (read_value == -1) {
         throw string("Read error. Errno = " + to_string(errno) + ".");
     }
-    
+
     string response_str = response;
 
     return parseResponse(response_str);
@@ -163,7 +163,7 @@ string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
     string id = "1";
 
     int serv_socket = sockets[server.GetHashKey()];
-    
+
     // On envoie une requête pour demander au serveur de se connecter sur le port spécifié par le client.
     string pushRequest = "GET " + id + "\r\nLISTEN_PORT " + listen_port + "\r\nSTART_DATE " + start_date + "\r\nEND_DATE " + end_date + "\r\n\r\n";
     send(serv_socket, pushRequest.c_str(), pushRequest.length(), 0);
@@ -180,6 +180,53 @@ string TCPModule::makeHistoricRequest(JSON params, const TCPServer & server)
     return string("Historic request return");
 }
 
+// JSON TCPModule::parseResponse(string & data)
+// {
+//     JSON json;
+//     string buffer;
+//     int index;
+//     string datacpy = data;
+//
+//     index = data.find_first_of ( "/" );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["day"] = buffer;
+//
+//     index = data.find_first_of ( "/" );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["month"] = buffer;
+//
+//     index = data.find_first_of ( " " );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["year"] = buffer;
+//
+//     index = data.find_first_of ( ":" );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["hours"] = buffer;
+//
+//     index = data.find_first_of ( ":" );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["minutes"] = buffer;
+//
+//     index = data.find_first_of ( " " );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["seconds"] = buffer;
+//
+//     index = data.find_first_of ( "\r" );
+//     buffer = data.substr(0, index);
+//     data = data.substr ( index+1 );
+//     json["value"] = buffer;
+//
+//     // json["timestamp"] = get_time()
+//
+//     return json;
+// }
+
 JSON TCPModule::parseResponse(string & data)
 {
     JSON json;
@@ -187,42 +234,55 @@ JSON TCPModule::parseResponse(string & data)
     int index;
     string datacpy = data;
 
+    // parse date
+    int oldindex = data.find_first_of ( " " );
+    buffer = data.substr(oldindex+1);
+    cout << buffer << endl;
+    index = buffer.find_first_of(" ");
+    buffer = data.substr(0, index+oldindex+1);
+    json["date"] = buffer;
+
+    // parse day
     index = data.find_first_of ( "/" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["day"] = buffer;
 
+    // parse month
     index = data.find_first_of ( "/" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["month"] = buffer;
 
+    // parse year
     index = data.find_first_of ( " " );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["year"] = buffer;
 
+    // parse hours
     index = data.find_first_of ( ":" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["hours"] = buffer;
 
+    // parse minutes
     index = data.find_first_of ( ":" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["minutes"] = buffer;
 
+    // parse seconds
     index = data.find_first_of ( " " );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["seconds"] = buffer;
 
+    // parse value
     index = data.find_first_of ( "\r" );
     buffer = data.substr(0, index);
     data = data.substr ( index+1 );
     json["value"] = buffer;
-
-    // json["timestamp"] = get_time()
 
     return json;
 }
