@@ -1,0 +1,9 @@
+1 - Décompresser l'archive
+2 - Lancer le serveur avec l'exécutable TPDataServer.exe se trouvant dans le dossier GenieLogiciel/client/Application
+3.1 - Ouvrir un terminal dans le dossier GenieLogiciel/client/server/server
+3.2 - Lancer la commande make
+3.3 - Lancer le serveur avec la commande ./server | Attention, le port 8070 doit être libre
+4.1 - Ouvrir un terminal dans le dossier GenieLogiciel/client
+4.2 - Lancer la commande npm install
+4.3 - Lancer la commande npm start, un onglet va s'ouvrir dans le navigateur | Attention, le port 3000 doit être libre
+5 - Utiliser l'application !
