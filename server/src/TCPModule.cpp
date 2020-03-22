@@ -36,7 +36,7 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 
-bool TCPModule::isConnected(const TCPServer server)
+bool TCPModule::isConnected(const TCPServer & server)
 {
     return sockets[server.GetHashKey()] > 0;
 }

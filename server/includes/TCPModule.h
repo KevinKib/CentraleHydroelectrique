@@ -79,7 +79,7 @@ protected:
     JSON parseResponse(string & data);
     // Transforme une réponse d'un serveur en un objet de format JSON.
 
-    bool isConnected(const TCPServer server);
+    bool isConnected(const TCPServer & server);
     // Retourne true si le serveur passé en paramètre est connecté ou non.
 
 //----------------------------------------------------- Attributs protégés
