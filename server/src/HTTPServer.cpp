@@ -24,7 +24,7 @@ HTTPServer::HTTPServer()
     string data = FileReader::ReadFile ( HTTPServer::CONFIG_FILENAME );
     if ( data.empty ( ) )
     {
-        throw runtime_error("Error during the reading of the config file " + HTTPServer::CONFIG_FILENAME);
+        throw string ( "Error during the reading of the config file " + HTTPServer::CONFIG_FILENAME );
     }
 
     JSON config = JSON::parse(data);
@@ -39,7 +39,8 @@ HTTPServer::HTTPServer()
 
     if (!get)
     {
-        throw runtime_error("Error during the retrieving of catalog");
+        cerr << "Error during te retrieving of catalog from the HTTP server. Please be sure that the HTTP server with the catalog is opened." << endl;
+        exit(1);
     }
 
     string catalogContent = get->body;
@@ -58,8 +59,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     auto centralIterator = req.params.find ( "hydraulic" );
     auto turbineIterator = req.params.find ( "turbine" );
     auto attributeIterator = req.params.find ( "attribute" );
-    auto dateIterator = req.params.find ( "date" );
-
 
     if (centralIterator == req.params.end ( ) || 
         turbineIterator == req.params.end ( ) ||
@@ -72,7 +71,6 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
     string hydraulic = centralIterator->second;
     string turbine = turbineIterator->second;
     string attribute = attributeIterator->second;
-    string date = dateIterator->second;
 
 
     // retrieve the server with the given parameters
@@ -82,19 +80,18 @@ string HTTPServer::proceedDataRequest ( const httplib::Request &req, TCPProtocol
         return response;
     }
 
-    // if ( protocol == TCPProtocol::PULL )
-    // {
-    //     response = tcp.MakeRequest ( nullptr, tcpServerResult.first );
-    // } 
-    // else
-    // {
-    //     JSON params;
-    //     params["date"] = date;
-    //     response = tcp.MakeRequest ( params, tcpServerResult.first );
-    // }
+    if ( protocol == TCPProtocol::PULL )
+    {
+        JSON json = tcp.MakeRequest ( nullptr, tcpServerResult.first );
+        response = to_string(json);
+    } 
+    else
+    {
+        throw string("TCP-PUSH Protocol is not implemented;");
+    }
 
     // // temporary
-    response = "Success";
+    // response = "Success";
     return response;
 }
 
@@ -180,7 +177,6 @@ void HTTPServer::configurateRoutes()
         [&](const httplib::Request &req, httplib::Response &res)
         {
             JSON result;
-
             string response = proceedDataRequest ( req, TCPProtocol::PULL );
 
             if ( response.empty ( ) )
@@ -189,7 +185,8 @@ void HTTPServer::configurateRoutes()
                 result["content"] = "Error !";
             } else
             {
-                result["content"] = response;
+                JSON json = JSON::parse(response);
+                result["content"] = json;
                 result["success"] = true;
             }
 
@@ -202,6 +199,5 @@ void HTTPServer::configurateRoutes()
 void HTTPServer::Run ( )
 {
     cout << "Server running with " << HTTPServer::SERVER_IP << ":" << HTTPServer::SERVER_PORT << endl;
-
     listen ( HTTPServer::SERVER_IP.c_str(), HTTPServer::SERVER_PORT );
 }
